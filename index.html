@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bean Machine Order Calculator</title>
+  <style>
+    :root {
+      /* Bean Machine palette (brown & tan) */
+      --brown: #6b4f3b;     /* primary */
+      --tan:   #d7c3a3;     /* accent */
+      --cream: #f7f3ec;     /* surfaces */
+      --ink:   #1f1a17;
+      --muted: #6a6a6a;
+      --border:#e7e1d6;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+
+      --bg: #faf8f3;
+      --panel: #ffffff;
+      --card: #ffffff;
+      --chip: #f5efe6;
+      --text: var(--ink);
+      --accent: var(--brown);
+      --radius: 16px;
+
+      /* Dark theme */
+      --bg-dark:#14110f; --panel-dark:#1d1916; --card-dark:#231e1a;
+      --chip-dark:#2c2621; --text-dark:#efe9e2; --border-dark:#3b322b;
+    }
+    [data-theme="dark"] {
+      --bg: var(--bg-dark);
+      --panel: var(--panel-dark);
+      --card: var(--card-dark);
+      --chip: var(--chip-dark);
+      --text: var(--text-dark);
+      --border: var(--border-dark);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; }
+    h1,h2,h3,h4{ font-family: Georgia, "Times New Roman", serif; letter-spacing:.2px; }
+
+    .container{ max-width:1200px; margin:32px auto; padding:0 16px; }
+    header{ display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .brand .logo{ width:48px; height:48px; border-radius:12px; box-shadow:var(--shadow); position:relative; background:linear-gradient(135deg, var(--tan) 0 50%, var(--brown) 50% 100%); }
+    .brand .logo::after{ content:"☕"; position:absolute; inset:0; display:grid; place-items:center; font-size:22px; }
+    .brand h1{ margin:0; font-size:1.4rem; letter-spacing:.3px; }
+
+    .grid{ display:grid; grid-template-columns:1.2fr .8fr; gap:20px; }
+    @media (max-width:980px){ .grid{ grid-template-columns:1fr; } }
+
+    .panel{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); }
+    .panel h2{ margin:0; padding:16px 18px; font-size:1rem; border-bottom:1px solid var(--border); }
+    .panel .content{ padding:16px; }
+
+    .section{ margin-bottom:16px; }
+    .cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+    .card h3{ margin:0; font-size:1rem; }
+    .price{ color:var(--accent); font-weight:700; }
+    .muted{ color:var(--muted); font-size:.9rem; }
+
+    .qty{ display:grid; grid-template-columns:32px 1fr 32px; align-items:center; gap:8px; margin-top:6px; }
+    .qty button{ height:36px; border-radius:10px; border:1px solid var(--border); background:var(--chip); color:var(--text); cursor:pointer; font-size:18px; }
+    .qty output{ text-align:center; }
+
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:var(--chip); color:var(--text); cursor:pointer; font-weight:600; text-decoration:none; }
+    .btn.primary{ background:linear-gradient(135deg, var(--brown), var(--tan)); border:none; color:#fff; }
+    .btn.block{ width:100%; }
+    .btn.ghost{ background:transparent; }
+
+    .toolrow{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .chip{ padding:6px 10px; border-radius:999px; background:var(--chip); border:1px solid var(--border); color:var(--muted); font-weight:700; font-size:.85rem; }
+
+    .divider{ height:1px; background:var(--border); margin:8px 0; }
+    .summary{ display:flex; flex-direction:column; gap:14px; }
+    .summary .row{ display:flex; justify-content:space-between; align-items:center; }
+    .summary .row.total{ font-size:1.2rem; font-weight:800; }
+
+    .discount{ display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
+    .discount input[type="range"]{ width:100%; }
+    .kbd{ font-family: ui-monospace, Menlo, Consolas, monospace; background:transparent; border:2px solid #8b5e3c; color:#8b5e3c; border-radius:8px; padding:4px 8px; font-weight:800; }
+
+    .order-card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:6px; }
+    .cart-item{ display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center; padding:8px; border-bottom:1px dashed var(--border); }
+    .cart-item:last-child{ border-bottom:none; }
+    .small{ font-size:.85rem; color:.var(--muted); }
+
+    .tabs{ display:flex; gap:8px; margin-bottom:10px; }
+    .tabs .btn[aria-selected="true"]{ outline:2px solid var(--accent); }
+
+    dialog{ width:min(760px,92vw); background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:18px; padding:0; }
+    dialog::backdrop{ background:rgba(0,0,0,.6); }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--border); }
+    .modal-body{ padding:16px; display:grid; gap:18px; }
+    .option{ display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:var(--card); }
+
+    .selector-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+    .select-card{ border:1px solid var(--border); background:var(--card); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px; }
+    .select-title{ font-weight:700; }
+    .select-qty{ display:grid; grid-template-columns:32px 1fr 32px; align-items:center; gap:8px; }
+    .select-qty button{ height:32px; border-radius:8px; border:1px solid var(--border); background:var(--chip); }
+
+    .ing-list{ display:grid; grid-template-columns:1fr auto; gap:8px; }
+    .ing-actions{ display:flex; gap:8px; justify-content:flex-end; }
+
+    .punchtray{display:flex;gap:8px;flex-wrap:wrap}
+    .chipbox{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--chip);border:1px dashed #cab8a0}
+    .chipbox.filled{background:repeating-conic-gradient(from 0deg, var(--brown) 0 20%, #593d2e 0 40%);border:none;color:#fff}
+    .chipbox.free{border:1px solid var(--brown)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Bean Machine Order Calculator</h1>
+          <div class="muted">Pick drinks & bakes, add deals, apply discounts, and get an exact total.</div>
+        </div>
+      </div>
+      <div class="toolrow">
+        <span class="chip">Autosaves</span>
+        <button class="btn ghost" id="themeBtn" aria-pressed="false" title="Toggle dark mode">🌙 Dark</button>
+        <button class="btn ghost" id="resetBtn">Clear All</button>
+        <button class="btn primary" id="checkoutBtn">Checkout</button>
+      </div>
+    </header>
+
+    <div class="flagbar" aria-hidden="true" style="height:10px;border-radius:8px;overflow:hidden;margin-bottom:18px;">
+      <div style="display:flex;height:100%;">
+        <div style="flex:1;background:var(--tan)"></div>
+        <div style="flex:1;background:var(--cream)"></div>
+        <div style="flex:1;background:var(--brown)"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Left: Menu -->
+      <section class="panel">
+        <h2>Menu</h2>
+        <div class="content">
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Coffee & Cocoa</h3>
+            <div class="cards" id="classic"></div>
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Specials & Bundles</h3>
+            <div class="cards" id="bundles"></div>
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Bakes & Drinks</h3>
+            <div class="cards" id="extras"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Orders -->
+      <aside class="panel">
+        <h2>Orders</h2>
+        <div class="content">
+          <div class="tabs" role="tablist" aria-label="Order panels">
+            <button class="btn" data-tab="summary" aria-selected="true">🧾 Summary</button>
+            <button class="btn" data-tab="history" aria-selected="false">📜 History</button>
+            <button class="btn" data-tab="ingredients" aria-selected="false">🧺 Ingredients</button>
+            <button class="btn" data-tab="loyalty" aria-selected="false">⭐ Loyalty</button>
+          </div>
+
+          <!-- SUMMARY TAB -->
+          <div id="tab-summary" role="tabpanel">
+            <div class="option" style="margin-bottom:10px;">
+              <div>
+                <div><strong>Fulfillment</strong></div>
+                <div class="small">City $50 · Sandy $100 · Paleto $150</div>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <label><input type="radio" name="fulfill" value="pickup"> Pickup</label>
+                <label><input type="radio" name="fulfill" value="delivery"> Delivery</label>
+                <select id="zoneSelect" style="margin-left:6px;">
+                  <option value="city">City</option>
+                  <option value="sandy">Sandy</option>
+                  <option value="paleto">Paleto</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="cart" class="order-card">
+              <div class="cart-item muted">Your order is empty. Add a drink or bake to get started.</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Sunday Saver -->
+            <div class="option" id="saverSection" style="margin-bottom:10px;">
+              <div>
+                <div><strong>Bean Saver Sunday</strong></div>
+                <div class="small" id="saverHelp">Each saver knocks $50 off (Sundays only)</div>
+              </div>
+              <div class="toolrow">
+                <span class="chip" id="saverChip">Savers: 0 (−$50 ea)</span>
+                <button class="btn" id="addSaverBtn">Add Saver</button>
+                <button class="btn ghost" id="removeSaverBtn">Remove Saver</button>
+                <button class="btn ghost" id="clearSaverBtn">Clear</button>
+              </div>
+            </div>
+
+            <div class="discount">
+              <label for="discountRange">Discount</label>
+              <div><span id="discountLabel" class="kbd">0%</span></div>
+              <input id="discountRange" type="range" min="0" max="100" step="5" value="0" />
+            </div>
+
+            <div class="summary" style="margin-top:12px;">
+              <div class="row"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+              <div class="row" id="deliveryRow" style="display:none;"><span>Delivery Fee</span><strong id="deliveryFee">$0.00</strong></div>
+              <div class="row"><span>Discount</span><strong id="discount">-$0.00</strong></div>
+              <div class="row"><span>Promotions</span><strong id="promotions">-$0.00</strong></div>
+              <div class="row total"><span>Total</span><strong id="total">$0.00</strong></div>
+              <div class="small" id="promoNotes"></div>
+            </div>
+
+            <div class="right-actions" style="margin-top:12px;">
+              <button class="btn primary block" id="checkoutBtn2">Checkout</button>
+              <button class="btn ghost block" id="resetBtn2">Clear All</button>
+            </div>
+          </div>
+
+          <!-- HISTORY TAB -->
+          <div id="tab-history" role="tabpanel" hidden>
+            <div class="summary" style="gap:8px; margin-bottom:8px;">
+              <div class="row"><span>Orders served today</span><strong id="ordersToday">0</strong></div>
+              <div class="row"><span>Orders served overall</span><strong id="ordersOverall">0</strong></div>
+            </div>
+            <div id="historyList" class="summary" style="gap:12px;"></div>
+            <div class="right-actions" style="margin-top:12px;">
+              <button class="btn ghost" id="clearHistoryBtn">Clear History</button>
+            </div>
+          </div>
+
+          <!-- INGREDIENTS TAB -->
+          <div id="tab-ingredients" role="tabpanel" hidden>
+            <div class="small muted" style="margin-bottom:6px;">Auto-aggregated from your current cart using each item's recipe and bundle selections.</div>
+            <div id="ingredientList" class="order-card" style="padding:12px;">
+              <div class="muted">No ingredients yet. Add items to the cart.</div>
+            </div>
+            <div class="ing-actions" style="margin-top:10px;">
+              <button class="btn" id="copyIngBtn">Copy List</button>
+              <button class="btn" id="exportIngBtn">Export CSV</button>
+            </div>
+          </div>
+
+          <!-- LOYALTY TAB -->
+          <div id="tab-loyalty" role="tabpanel" hidden>
+            <div class="option" style="margin-bottom:10px;">
+              <div>
+                <div><strong>Loyalty Manager</strong></div>
+                <div class="small">10 punches. 10th is free → Café Feast (2 drinks + 2 waffles + 2 pastries).</div>
+                <div class="small" id="dpStatus">Double Punch Tuesday:(ACTIVE only on Tuesdays)</div>
+              </div>
+              <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;align-items:end;max-width:860px">
+                <div>
+                  <label class="small muted">Player Name</label>
+                  <input id="loy-player" placeholder="John Doe" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;color:#000" />
+                </div>
+                <button class="btn primary" id="loy-add">Add Punch</button>
+                <div style="text-align:right">
+                  <div class="small muted">Visit</div>
+                  <div class="toolrow" style="justify-content:flex-end">
+                    <span class="chip" id="visitInfo">#1 • 0 punched</span>
+                    <button class="btn" id="newVisitBtn" title="Start a new visit (resets per-visit limits)">New Visit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-card" style="padding:12px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                <div>
+                  <div class="small muted">Punch Card</div>
+                  <div id="loy-tray" class="punchtray" aria-live="polite"></div>
+                </div>
+                <div class="toolrow">
+                  <button class="btn" id="loy-undo">-1 Punch</button>
+                  <button class="btn" id="loy-redeem">Redeem Reward → Pick Feast</button>
+                </div>
+              </div>
+              <div id="loy-status" class="small muted" style="margin-top:6px;">—</div>
+            </div>
+
+            <div class="order-card" style="padding:0;">
+              <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <strong>Customers</strong>
+                <div class="small muted" id="loy-stats">Players: 0 • Rewards banked: 0</div>
+              </div>
+              <div style="padding:12px;">
+                <table style="width:100%;border-collapse:collapse">
+                  <thead>
+                    <tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Player</th>
+                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Punches</th>
+                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Rewards</th>
+                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Last</th>
+                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)"></th></tr>
+                  </thead>
+                  <tbody id="loy-body"></tbody>
+                </table>
+              </div>
+              <div style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                <button class="btn" id="loy-export">Export JSON</button>
+              </div>
+            </div>
+          </div>
+          <!-- /LOYALTY TAB -->
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Combo/Bundle Selector Modal -->
+  <dialog id="comboModal">
+    <div class="modal-header">
+      <strong id="comboTitle">Choose Drinks</strong>
+      <button class="btn" id="closeCombo" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="comboSteps"></div>
+      <div id="comboContent"></div>
+      <div class="toolrow" style="justify-content:flex-end; margin-top:6px;">
+        <button class="btn" id="comboPrev" style="display:none;">Back</button>
+        <button class="btn primary" id="comboNext">Next</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // ---------- Data ----------
+    const MENU = {
+      // Treat these as "base beverages" (formerly pizzas) so the wizard works unchanged.
+      classic: [
+        { id: 'bev-bean', name: '☕ Bean Coffee',  price: 35, type:'pizza' },
+        { id: 'bev-capp', name: '🥛 Cappuccino',  price: 40, type:'pizza' },
+        { id: 'bev-iced', name: '🧊 Iced Latte',  price: 40, type:'pizza' },
+        { id: 'bev-esp',  name: '⚡ Espresso',     price: 60, type:'pizza' },
+        { id: 'bev-choc', name: '🍫 Hot Chocolate',price: 65, type:'pizza' },
+      ],
+      // We don't need specialty vs classic here, so keep specialty empty.
+      specialty: [],
+      // Bundles & specials (some open a wizard to pick drink types)
+      bundles: [
+        // Simple new café meals (wizard to pick DRINKS; waffles auto-added)
+        { id: 'bd-med',  name:'🥐 Medium Café Meal: 1 Drink + 1 Waffle', price: 50, type:'bundle', pizzasIncluded:1, allow:'classic', drinksIncluded:0, description:'Pick any 1 drink. Comes with 1 Wonder Waffle (included).'},
+        { id: 'bd-large',name:'🥐 Large Café Meal: 2 Drinks + 2 Waffles', price: 95, type:'bundle', pizzasIncluded:2, allow:'classic', drinksIncluded:0, description:'Pick any 2 drinks. Comes with 2 Wonder Waffles (included).'},
+
+        // Screenshot specials (fixed-price; no wizard)
+        { id:'sp-10x10', name:'10×10 Special', price:600, type:'bundle', description:'10 Pink Lemonades / Iced Lattes + 10 Wonder Waffles.'},
+        { id:'sp-hay',   name:'Hayward Special', price:2700, type:'bundle', description:'4 “10×10 with Iced Lattes” + 2 Cakes of your choosing.'},
+        { id:'sp-kids',  name:"Kids Meal with Toy", price:2000, type:'bundle', description:'5 Wonder Waffles + 5 Hot Chocolates.'},
+      ],
+      // Ready-made bakes & drinks
+      extras: [
+        { id: 'ex-lemon', name: '🩷 Pink Lemonade', price: 20, type: 'extra', isDrink: true },
+        { id: 'ex-cup',   name: '🧁 Cupcake',       price: 13, type: 'extra' },
+        { id: 'ex-cookie',name: '🍪 Cream Cookie',  price: 15, type: 'extra' },
+        { id: 'ex-cheese',name: '🍰 Cheesecake',    price: 16, type: 'extra' },
+        { id: 'ex-donut', name: '🍩 Donut',         price: 10, type: 'extra' },
+        { id: 'ex-waffle',name: '🧇 Wonder Waffle', price: 10, type: 'extra' },
+        { id: 'ex-bag',   name: '🛍️ Paper Bag',    price: 1,  type: 'extra' },
+        { id: 'ex-lunch', name: '🍱 Lunch Box',     price: 275, type: 'extra' },
+      ],
+      // Unused sections kept for structural parity
+      deals: [],
+      packs: [],
+    };
+
+    // Ingredient recipes (from screenshot)
+    const RECIPE_MAP = {
+      'bev-bean': { 'Water':2, 'Coffee bag':1 },
+      'bev-capp': { 'Coffee bag':1, 'Water':1, 'Milk':1 },
+      'bev-iced': { 'Coffee bag':1, 'Sugar':1, 'Milk':1, 'Water':1 },
+      'bev-esp' : { 'Coffee bag':2, 'Water':2 },
+      'bev-choc': { 'Milk':2, 'Sugar':2, 'Cocoa Powder':4 },
+      // Bakes can be added here later as needed
+    };
+
+    const currency = n => `$${n.toFixed(2)}`;
+
+    // ---------- State ----------
+    const STATE_KEY = 'beanmachine_state_v1';
+    const HIST_KEY  = 'beanmachine_history_v1';
+
+    const state = {
+      cart: [],
+      discountPct: 0,
+      history: [],
+      fulfillment: 'pickup',
+      deliveryZone: 'city',
+      pizzaSavers: 0
+    };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
+      const savedHist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+      if (Array.isArray(savedHist)) state.history = savedHist;
+      if (saved) {
+        if (Array.isArray(saved.cart)) state.cart = saved.cart;
+        if (typeof saved.discountPct === 'number') state.discountPct = saved.discountPct;
+        if (saved.fulfillment) state.fulfillment = saved.fulfillment;
+        if (saved.deliveryZone) state.deliveryZone = saved.deliveryZone;
+        if (typeof saved.pizzaSavers === 'number') state.pizzaSavers = saved.pizzaSavers;
+      }
+    } catch {}
+
+    const persist = () =>
+      localStorage.setItem(STATE_KEY, JSON.stringify({
+        cart: state.cart,
+        discountPct: state.discountPct,
+        fulfillment: state.fulfillment,
+        deliveryZone: state.deliveryZone,
+        pizzaSavers: state.pizzaSavers
+      }));
+    const persistHistory = () => localStorage.setItem(HIST_KEY, JSON.stringify(state.history));
+
+    // ---------- Helpers ----------
+    function findMenuItem(id){
+      const pools = [MENU.classic, MENU.specialty, MENU.deals, MENU.packs, MENU.bundles, MENU.extras];
+      for (const pool of pools){ const f = pool.find(x=>x.id===id); if (f) return f; }
+      return null;
+    }
+    function getDrinkPool(){ 
+      // Drinks include base beverages and Pink Lemonade (in extras)
+      return [...MENU.classic, ...MENU.extras.filter(x=>x.isDrink)];
+    }
+    function getPizzaPool(allow){
+      // Beverages act as "pizzas" for the wizard
+      return MENU.classic;
+    }
+    function isSpecialtyId(pid){ return false; } // not used
+
+    // ---------- Cards ----------
+    function cardHTML(item){
+      const needsCombo = (item.pizzasIncluded||0) > 0 || (item.drinksIncluded||0) > 0;
+      return `
+        <article class="card">
+          <h3>${item.name}</h3>
+          <div class="toolrow" style="justify-content:space-between;">
+            <span class="price">${currency(item.price)}</span>
+            <div class="qty">
+              <button aria-label="decrease">−</button>
+              <output>1</output>
+              <button aria-label="increase">+</button>
+            </div>
+          </div>
+          ${
+            needsCombo
+              ? `<button class="btn" data-wizard="${item.id}">Choose &amp; Add</button>`
+              : `<button class="btn" data-add="${item.id}">Add</button>`
+          }
+        </article>`;
+    }
+
+    function renderCards(){
+      const classic = document.getElementById('classic');
+      const bundles = document.getElementById('bundles');
+      const extras = document.getElementById('extras');
+
+      const make = arr => arr.map(cardHTML).join('');
+      classic.innerHTML = make(MENU.classic);
+      bundles.innerHTML = make(MENU.bundles);
+      extras.innerHTML = make(MENU.extras);
+
+      const allItems = [...MENU.classic, ...MENU.bundles, ...MENU.extras];
+
+      document.querySelectorAll('.cards .card').forEach(card=>{
+        let count = 1;
+        const out = card.querySelector('output');
+        const minus = card.querySelector('button[aria-label="decrease"]');
+        const plus  = card.querySelector('button[aria-label="increase"]');
+        minus?.addEventListener('click',()=>{ count=Math.max(1,count-1); out.value=count; });
+        plus?.addEventListener('click',()=>{ count++; out.value=count; });
+
+        const wizId = card.querySelector('[data-wizard]')?.getAttribute('data-wizard');
+        if (wizId){
+          const item = allItems.find(i=>i.id===wizId);
+          card.querySelector('[data-wizard]').addEventListener('click', ()=> openComboWizard(item, count));
+          return;
+        }
+
+        const addId = card.querySelector('[data-add]')?.getAttribute('data-add');
+        if (addId){
+          const item = allItems.find(i=>i.id===addId);
+          card.querySelector('[data-add]').addEventListener('click',()=>{
+            addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:count, type:item.type });
+            // Auto-add included waffles for our Medium/Large Café Meals
+            if (item.id==='bd-med') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:1*count, type:'extra', meta:'Meal' });
+            if (item.id==='bd-large') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:2*count, type:'extra', meta:'Meal' });
+            if (item.id==='sp-kids') {
+              addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Special)', unitPrice:0, qty:5*count, type:'extra', meta:'Kids Meal' });
+              addToCart({ id:'bev-choc', name:'🍫 Hot Chocolate (Special)', unitPrice:0, qty:5*count, type:'pizza', meta:'Kids Meal' });
+            }
+          });
+        }
+      });
+    }
+
+    // ---------- Cart ----------
+    function renderCart(){
+      const cart = document.getElementById('cart');
+      if (!state.cart.length){
+        cart.innerHTML = `<div class="cart-item muted">Your order is empty. Add a drink or bake to get started.</div>`;
+        return;
+      }
+      cart.innerHTML = state.cart.map((l,idx)=>`
+        <div class="cart-item">
+          <div>
+            <div><strong>${l.name}</strong></div>
+            <div class="small">${currency(l.unitPrice)} each${l.meta?` • ${l.meta}`:''}</div>
+          </div>
+          <div class="qty">
+            <button data-dec="${idx}">−</button>
+            <output>${l.qty}</output>
+            <button data-inc="${idx}">+</button>
+          </div>
+          <div><strong>${currency(l.unitPrice*l.qty)}</strong></div>
+        </div>`).join('');
+
+      cart.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.getAttribute('data-inc'); state.cart[i].qty++; persist(); renderCart(); renderTotals(); renderIngredients(); }));
+      cart.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.getAttribute('data-dec'); state.cart[i].qty--; if(state.cart[i].qty<=0) state.cart.splice(i,1); persist(); renderCart(); renderTotals(); renderIngredients(); }));
+    }
+
+    function addToCart(line){
+      const key = `${line.id||line.name}|${line.unitPrice}|${line.type||''}|${(line.meta||'')}`;
+      const found = state.cart.find(l =>
+        `${l.id||l.name}|${l.unitPrice}|${l.type||''}|${(l.meta||'')}` === key &&
+        JSON.stringify(l.combo||[])===JSON.stringify(line.combo||[]) &&
+        JSON.stringify(l.drinks||{})===JSON.stringify(line.drinks||{})
+      );
+      if (found) found.qty += line.qty; else state.cart.push(line);
+      persist(); renderCart(); renderTotals(); renderIngredients();
+    }
+
+    // ---------- Fulfillment ----------
+    const ZONE_FEES = { city:50, sandy:100, paleto:150 };
+
+    function renderFulfillment(){
+      const radios = document.querySelectorAll('input[name="fulfill"]');
+      radios.forEach(r => r.checked = (r.value === state.fulfillment));
+      const zoneSel = document.getElementById('zoneSelect');
+      zoneSel.value = state.deliveryZone;
+      zoneSel.disabled = state.fulfillment !== 'delivery';
+    }
+
+    document.querySelectorAll('input[name="fulfill"]').forEach(r=>{
+      r.addEventListener('change', e=>{
+        state.fulfillment = e.target.value;
+        persist(); renderFulfillment(); renderTotals();
+      });
+    });
+    document.getElementById('zoneSelect').addEventListener('change', e=>{
+      state.deliveryZone = e.target.value;
+      persist(); renderTotals();
+    });
+
+    // ---------- Bean Saver Sunday ----------
+    function isSunday(){ return new Date().getDay() === 0; }
+    function renderPizzaSaver(){
+      const chip = document.getElementById('saverChip');
+      chip.textContent = `Savers: ${state.pizzaSavers} (−$50 ea)`;
+      const addBtn = document.getElementById('addSaverBtn');
+      const rmBtn = document.getElementById('removeSaverBtn');
+      const clrBtn = document.getElementById('clearSaverBtn');
+      const help = document.getElementById('saverHelp');
+
+      if (isSunday()){
+        addBtn.disabled = false;
+        help.textContent = 'Each saver knocks $50 off (Sundays only)';
+      } else {
+        addBtn.disabled = true;
+        help.textContent = 'Unavailable today (Sundays only)';
+      }
+
+      const has = state.pizzaSavers > 0;
+      rmBtn.disabled = !has;
+      clrBtn.disabled = !has;
+    }
+    document.getElementById('addSaverBtn').addEventListener('click', ()=>{
+      if (!isSunday()) return;
+      state.pizzaSavers += 1;
+      persist(); renderPizzaSaver(); renderTotals();
+    });
+    document.getElementById('removeSaverBtn').addEventListener('click', ()=>{
+      if (state.pizzaSavers > 0) {
+        state.pizzaSavers -= 1;
+        persist(); renderPizzaSaver(); renderTotals();
+      }
+    });
+    document.getElementById('clearSaverBtn').addEventListener('click', ()=>{
+      if (state.pizzaSavers > 0) {
+        state.pizzaSavers = 0;
+        persist(); renderPizzaSaver(); renderTotals();
+      }
+    });
+
+    // ---------- Promotions ----------
+    function computePromotions(){
+      const day = new Date().getDay(); // 0 Sun .. 6 Sat
+      let notes = [];
+      let discount = 0;
+
+      // Weekdays (Mon–Wed): BOGO 50% on drinks
+      if (day>=1 && day<=3){
+        const unitPrices = [];
+        state.cart.forEach(l=>{ if (l.type === 'pizza'){ for(let i=0;i<l.qty;i++) unitPrices.push(l.unitPrice); } });
+        if (unitPrices.length >= 2){
+          unitPrices.sort((a,b)=>b-a);
+          for (let i=0;i<unitPrices.length; i+=2){
+            const p2 = unitPrices[i+1];
+            if (typeof p2 === 'number') discount += p2 * 0.5;
+          }
+          if (discount>0) notes.push('Mon–Wed BOGO 50% on drinks applied');
+        }
+      }
+
+      // Thu–Sat: Free donut with each 10×10 special (max 4)
+      if (day>=4 && day<=6){
+        const tenQty = state.cart.reduce((s,l)=> s + ((l.id==='sp-10x10')?l.qty:0), 0);
+        if (tenQty>0){
+          const donut = state.cart.find(l=>l.id==='ex-donut');
+          if (donut){
+            const freeQty = Math.min(4*tenQty, donut.qty);
+            if (freeQty>0){
+              discount += freeQty * donut.unitPrice;
+              notes.push(`Thu–Sat free donuts (${freeQty}) with 10×10 special`);
+            }
+          }
+        }
+      }
+
+      // Sunday saver
+      if (day===0 && state.pizzaSavers>0){
+        const saverDiscount = 50 * state.pizzaSavers;
+        discount += saverDiscount;
+        notes.push(`Bean Saver Sunday: ${state.pizzaSavers}×$50`);
+      }
+
+      return { discount: +(discount.toFixed(2)), notes };
+    }
+
+    // ---------- Totals ----------
+    function renderTotals(){
+      const subtotal = state.cart.reduce((s,l)=>s + l.unitPrice*l.qty, 0);
+      const manual = +(subtotal * (state.discountPct/100)).toFixed(2);
+      const promo = computePromotions();
+      const deliveryFee = state.fulfillment==='delivery' ? (ZONE_FEES[state.deliveryZone]||0) : 0;
+      const total = subtotal + deliveryFee - manual - promo.discount;
+
+      document.getElementById('subtotal').textContent = currency(subtotal);
+      document.getElementById('discount').textContent = `-${currency(manual)}`;
+      document.getElementById('promotions').textContent = `-${currency(promo.discount)}`;
+      document.getElementById('total').textContent = currency(total);
+      document.getElementById('promoNotes').textContent = promo.notes.join(' • ');
+      const row = document.getElementById('deliveryRow');
+      if (deliveryFee>0){ row.style.display='flex'; document.getElementById('deliveryFee').textContent = currency(deliveryFee); }
+      else { row.style.display='none'; document.getElementById('deliveryFee').textContent = currency(0); }
+    }
+
+    // ---------- Discount slider ----------
+    const range = document.getElementById('discountRange');
+    const discountLabel = document.getElementById('discountLabel');
+    function renderDiscount(){ range.value = state.discountPct; discountLabel.textContent = `${state.discountPct}%`; }
+    range.addEventListener('input', ()=>{ state.discountPct = +range.value; persist(); renderTotals(); discountLabel.textContent = `${state.discountPct}%`; });
+
+    // ---------- History ----------
+    function ordersServedCounters(){
+      const todayStr = new Date().toDateString();
+      const today = state.history.filter(h=> new Date(h.id).toDateString() === todayStr).length;
+      const overall = state.history.length;
+      document.getElementById('ordersToday').textContent = today;
+      document.getElementById('ordersOverall').textContent = overall;
+    }
+
+    function renderHistory(){
+      ordersServedCounters();
+      const list = document.getElementById('historyList');
+      if (!state.history.length){ list.innerHTML = '<div class="muted">No past orders yet. Checkout to save one.</div>'; return; }
+      list.innerHTML = state.history.map(h=>`
+        <article class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div>
+              <div><strong>${new Date(h.id).toLocaleString()}</strong></div>
+              <div class="small">${h.items.length} item(s) • Discount ${h.discountPct}%</div>
+            </div>
+            <div><strong>${currency(h.total)}</strong></div>
+          </div>
+          <details class="small" style="margin-top:6px;">
+            <summary>View items</summary>
+            <ul style="margin:6px 0 0 16px;">
+              ${h.items.map(i=>`<li>${i.qty}× ${i.name}${i.meta?` <span class=small>(${i.meta})</span>`:''} — ${currency(i.lineTotal)}</li>`).join('')}
+            </ul>
+          </details>
+          <div class="toolrow" style="justify-content:flex-end;">
+            <button class="btn" data-reorder="${h.id}">Reorder</button>
+            <button class="btn ghost" data-delete="${h.id}">Delete</button>
+          </div>
+        </article>
+      `).join('');
+
+      list.querySelectorAll('[data-reorder]').forEach(btn=>btn.addEventListener('click',()=>{
+        const id = +btn.getAttribute('data-reorder');
+        const h = state.history.find(x=>x.id===id); if(!h) return;
+        h.items.forEach(it => addToCart({ id: it.id || null, name: it.name, unitPrice: it.unit, qty: it.qty, meta: it.meta || null, combo: it.combo || null, drinks: it.drinks || null }));
+      }));
+      list.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',()=>{
+        const id = +btn.getAttribute('data-delete');
+        state.history = state.history.filter(x=>x.id!==id); persistHistory(); renderHistory();
+      }));
+    }
+    document.getElementById('clearHistoryBtn').addEventListener('click',()=>{ if(confirm('Clear all saved orders?')){ state.history=[]; persistHistory(); renderHistory(); ordersServedCounters(); } });
+
+    // ---------- Tabs ----------
+    const tabButtons = document.querySelectorAll('[data-tab]');
+    function selectTab(which){
+      document.getElementById('tab-summary').hidden = which!== 'summary';
+      document.getElementById('tab-history').hidden = which!== 'history';
+      document.getElementById('tab-ingredients').hidden = which!== 'ingredients';
+      document.getElementById('tab-loyalty').hidden = which!== 'loyalty';
+      tabButtons.forEach(b=>b.setAttribute('aria-selected', String(b.getAttribute('data-tab')===which)));
+      if (which==='ingredients') renderIngredients();
+      if (which==='history') ordersServedCounters();
+      if (which==='loyalty') loyaltyRenderAll();
+    }
+    tabButtons.forEach(b=>b.addEventListener('click',()=>selectTab(b.getAttribute('data-tab'))));
+
+    // ---------- Wizard (pick drink types for our meals) ----------
+    const comboModal = document.getElementById('comboModal');
+    const comboTitle = document.getElementById('comboTitle');
+    const comboSteps = document.getElementById('comboSteps');
+    const comboContent = document.getElementById('comboContent');
+    const comboPrev = document.getElementById('comboPrev');
+    const comboNext = document.getElementById('comboNext');
+    document.getElementById('closeCombo').addEventListener('click', ()=> comboModal.close());
+
+    function openComboWizard(item, qty){
+      const beveragesNeeded = item.pizzasIncluded || 0; // repurpose
+      const drinkPool = getDrinkPool();
+
+      const drinkCounts = {};
+      let step = 0; // single-step wizard (drinks), then confirm
+
+      const renderSteps = ()=>{
+        const parts = [];
+        if (beveragesNeeded>0) parts.push(step===0?'<strong>1. Drinks</strong>':'1. Drinks');
+        parts.push(step===1?'<strong>2. Confirm</strong>':'2. Confirm');
+        comboSteps.innerHTML = parts.join(' · ');
+      };
+
+      const renderGrid = (pool, counts, needed, label)=>{
+        const used = Object.values(counts).reduce((a,b)=>a+b,0);
+        const remaining = needed - used;
+        comboTitle.textContent = `${label} — pick ${needed} (remaining ${Math.max(0,remaining)})`;
+        comboContent.innerHTML = `
+          <div class="selector-grid">
+            ${pool.map(p=>`
+              <div class="select-card" data-id="${p.id}">
+                <div class="select-title">${p.name}</div>
+                <div class="select-qty">
+                  <button data-minus="${p.id}">−</button>
+                  <output data-out="${p.id}">${counts[p.id]||0}</output>
+                  <button data-plus="${p.id}">+</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        `;
+        comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-plus');
+            const currentUsed = Object.values(counts).reduce((a,b)=>a+b,0);
+            if (currentUsed < needed){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value = counts[id]; renderGrid(pool, counts, needed, label); }
+          });
+        });
+        comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-minus');
+            counts[id]=Math.max(0,(counts[id]||0)-1);
+            comboContent.querySelector(`[data-out="${id}"]`).value = counts[id];
+            renderGrid(pool, counts, needed, label);
+          });
+        });
+        comboPrev.style.display = 'none';
+        comboNext.textContent = 'Next';
+        comboNext.disabled = remaining>0;
+      };
+
+      const renderConfirm = ()=>{
+        comboTitle.textContent = item.name || 'Confirm Selection';
+        const fmtName = (id)=> (findMenuItem(id)||{}).name || id;
+        const drinkList = Object.entries(drinkCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
+        const info = (findMenuItem(item.id)?.description)||'';
+        comboContent.innerHTML = `
+          <div class="summary" style="gap:10px;">
+            ${drinkList.length?`<div><strong>Drinks:</strong> ${drinkList.join(', ')}</div>`:''}
+            ${info?`<div class="small muted">${info}</div>`:''}
+          </div>
+        `;
+        comboPrev.style.display = 'none';
+        comboNext.textContent = 'Add to Cart';
+        comboNext.disabled = false;
+      };
+
+      const toArrayByCounts = (counts)=> Object.entries(counts).flatMap(([id,c])=> Array(c).fill(id));
+
+      comboPrev.onclick = ()=>{};
+      comboNext.onclick = ()=>{
+        if (step===0){ step=1; renderConfirm(); return; }
+
+        // finalize
+        const drinkIds = toArrayByCounts(drinkCounts);
+        const fmtName = (id)=> (findMenuItem(id)||{}).name || id;
+        const drinkParts = Object.entries(drinkCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
+        const meta = drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
+
+        addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:qty||1, type:item.type, drinks: drinkCounts, meta });
+
+        // Auto-add included waffles
+        if (item.id==='bd-med') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:1*(qty||1), type:'extra', meta:'Meal' });
+        if (item.id==='bd-large') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:2*(qty||1), type:'extra', meta:'Meal' });
+
+        comboModal.close();
+      };
+
+      renderSteps();
+      renderGrid(drinkPool, drinkCounts, beveragesNeeded, 'Drinks');
+      comboModal.showModal();
+    }
+
+    // ---------- Ingredients Aggregation ----------
+    function aggregateIngredients(){
+      const tally = {};
+      const add = (name, n=1)=>{ if(!name) return; tally[name] = (tally[name]||0)+n; };
+
+      state.cart.forEach(line=>{
+        if((line.type==='pizza' || line.type==='extra') && line.id && RECIPE_MAP[line.id]){
+          Object.entries(RECIPE_MAP[line.id]).forEach(([ing,count])=> add(ing, count*line.qty));
+        }
+      });
+      return tally;
+    }
+
+    function renderIngredients(){
+      const wrap = document.getElementById('ingredientList');
+      const tally = aggregateIngredients();
+      const entries = Object.entries(tally).sort((a,b)=> a[0].localeCompare(b[0]));
+      if(entries.length===0){ wrap.innerHTML = '<div class="muted">No ingredients yet. Add items to the cart.</div>'; return; }
+      wrap.innerHTML = entries.map(([name,count])=>`<div class="ing-list"><div>${name}</div><div><strong>x${count}</strong></div></div>`).join('');
+    }
+
+    // Copy / Export actions
+    document.getElementById('copyIngBtn').addEventListener('click',()=>{
+      const tally = aggregateIngredients();
+      const txt = Object.entries(tally).sort((a,b)=>a[0].localeCompare(b[0])).map(([n,c])=>`- ${n} x${c}`).join('\n');
+      navigator.clipboard.writeText(txt).then(()=> alert('Ingredients copied to clipboard!'));
+    });
+
+    document.getElementById('exportIngBtn').addEventListener('click',()=>{
+      const tally = aggregateIngredients();
+      const rows = [['Ingredient','Count'], ...Object.entries(tally).sort((a,b)=>a[0].localeCompare(b[0]))];
+      const csv = rows.map(r=> r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'beanmachine_ingredients.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    function renderAll(){ renderCards(); renderCart(); renderFulfillment(); renderPizzaSaver(); renderTotals(); renderDiscount(); renderHistory(); }
+
+    // ---------- Checkout / Reset ----------
+    function checkout(){
+      if (!state.cart.length){ alert('Your order is empty.'); return; }
+      const subtotal = state.cart.reduce((s,l)=>s + l.unitPrice*l.qty, 0);
+      const manual = +(subtotal * (state.discountPct/100)).toFixed(2);
+      const promo = computePromotions();
+      const deliveryFee = state.fulfillment==='delivery' ? (ZONE_FEES[state.deliveryZone]||0) : 0;
+      const total = +(subtotal + deliveryFee - manual - promo.discount).toFixed(2);
+      const entry = {
+        id: Date.now(),
+        items: state.cart.map(l=>({ id: l.id || null, name: l.name, qty: l.qty, unit: l.unitPrice, meta: l.meta||null, combo: l.combo||null, drinks: l.drinks||null, lineTotal:+(l.unitPrice*l.qty).toFixed(2) })),
+        discountPct: state.discountPct,
+        subtotal:+subtotal.toFixed(2),
+        deliveryFee,
+        promoDiscount: promo.discount,
+        manualDiscount: manual,
+        pizzaSavers: state.pizzaSavers,
+        total
+      };
+      state.history.unshift(entry); persistHistory();
+
+      state.cart = [];
+      state.discountPct = 0;
+      state.pizzaSavers = 0;
+      persist();
+      renderAll();
+      newVisit(true);
+      selectTab('summary');
+    }
+    function resetAll(){
+      state.cart = [];
+      state.discountPct = 0;
+      state.pizzaSavers = 0;
+      persist(); renderAll(); renderIngredients();
+    }
+
+    document.getElementById('checkoutBtn').addEventListener('click', checkout);
+    document.getElementById('checkoutBtn2').addEventListener('click', checkout);
+    document.getElementById('resetBtn').addEventListener('click', resetAll);
+    document.getElementById('resetBtn2').addEventListener('click', resetAll);
+
+    // ---------- Theme ----------
+    const themeBtn = document.getElementById('themeBtn');
+    function applyTheme(t){
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('beanmachine_theme', t);
+      themeBtn.textContent = t==='dark' ? '☀️ Light' : '🌙 Dark';
+      themeBtn.setAttribute('aria-pressed', t==='dark');
+    }
+    applyTheme(localStorage.getItem('beanmachine_theme') || 'light');
+    themeBtn.addEventListener('click',()=>{ const next = (localStorage.getItem('beanmachine_theme')||'light')==='light' ? 'dark' : 'light'; applyTheme(next); });
+
+    // ---------- LOYALTY (same API contract) ----------
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzV2Rm1bdRN6Be_qBPMoGmXORVG8rRBLTeAnS_agrKm-nxRUNQr9smsozc3CviAynvrjQ/exec';
+
+    const REQUIRED_PUNCHES = 10;
+    const DAILY_LIMIT_HOURS = 0;
+
+    const loy = {
+      els: {
+        id: document.getElementById('loy-player'),
+        add: document.getElementById('loy-add'),
+        undo: document.getElementById('loy-undo'),
+        redeem: document.getElementById('loy-redeem'),
+        tray: document.getElementById('loy-tray'),
+        body: document.getElementById('loy-body'),
+        stats: document.getElementById('loy-stats'),
+        status: document.getElementById('loy-status'),
+        dp: document.getElementById('dpStatus'),
+        exportBtn: document.getElementById('loy-export'),
+        visitInfo: document.getElementById('visitInfo'),
+        newVisitBtn: document.getElementById('newVisitBtn'),
+      },
+      players: {},
+      currentId: null,
+      visitId: Number(localStorage.getItem('bm_visit_id') || '1'),
+      visitPunched: JSON.parse(localStorage.getItem('bm_visit_punched') || '[]'),
+    };
+
+    function saveVisit(){
+      localStorage.setItem('bm_visit_id', String(loy.visitId));
+      localStorage.setItem('bm_visit_punched', JSON.stringify(loy.visitPunched));
+      loy.els.visitInfo.textContent = `#${loy.visitId} • ${loy.visitPunched.length} punched`;
+    }
+    function newVisit(auto=false){
+      if (!auto && !confirm('Start a new visit? (resets per-visit punch limit)')) return;
+      loy.visitId += 1;
+      loy.visitPunched = [];
+      saveVisit();
+      loySetStatus(`Visit #${loy.visitId} started. Per-visit limits reset.`, true);
+    }
+    saveVisit();
+    loy.els.newVisitBtn.addEventListener('click', ()=> newVisit(false));
+
+    function isDoubleTuesday(){ return new Date().getDay() === 2; }
+
+    function loySetStatus(msg, ok=true){
+      loy.els.status.innerHTML = `<span style="font-weight:700;${ok?'color:#1a7f37':'color:#b71c1c'}">${ok?'✓':'✗'}</span> ${msg}`;
+    }
+    function loyUpdateDPLabel(){
+      const active = isDoubleTuesday();
+      loy.els.dp.textContent = `Double Punch Tuesday: ${active ? 'ACTIVE all day' : 'auto all day on Tuesdays'}`;
+      loy.els.dp.style.fontWeight = active ? '700' : '400';
+    }
+    setInterval(loyUpdateDPLabel, 30_000); loyUpdateDPLabel();
+
+    async function api(method, body){
+      const url = API_URL + '?m=' + encodeURIComponent(method);
+
+      if (method === 'list') {
+        const res = await fetch(url, { method:'GET' });
+        const txt = await res.text();
+        let data = {};
+        try { data = JSON.parse(txt); } catch {}
+        if (!res.ok || (data && data.ok === false)) {
+          const msg = data && data.error ? data.error : `HTTP ${res.status} ${res.statusText}`;
+          throw new Error(msg);
+        }
+        return data;
+      }
+
+      const res = await fetch(url, { method: 'POST', body: JSON.stringify(body || {}) });
+      const txt = await res.text();
+      let data = {};
+      try { data = JSON.parse(txt); } catch {}
+      if (!res.ok || (data && data.ok === false)) {
+        const msg = data && data.error ? data.error : `HTTP ${res.status} ${res.statusText}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    function loyRenderTray(player){
+      loy.els.tray.innerHTML = '';
+      const punches = player ? (player.punches||0) : 0;
+      for(let i=0;i<REQUIRED_PUNCHES;i++){
+        const div = document.createElement('div');
+        div.className = 'chipbox' + (i < punches ? ' filled':'' ) + (i===REQUIRED_PUNCHES-1 ? ' free':'' );
+        div.textContent = i < punches ? '☕' : (i===REQUIRED_PUNCHES-1 ? 'FREE' : '☕');
+        loy.els.tray.appendChild(div);
+      }
+    }
+
+    function loyRenderTable(){
+      const entries = Object.entries(loy.players);
+      loy.els.body.innerHTML = entries.map(([id,p])=>`
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid var(--border)">${id}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.punches||0}/${REQUIRED_PUNCHES}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.rewards||0}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.last? new Date((p.last)*1000).toLocaleString() : '—'}</td>
+          <td style="padding:8px;border-bottom:1px solid var(--border)"><button class="btn" data-loyload="${id}">Load</button></td>
+        </tr>`).join('');
+      loy.els.body.querySelectorAll('[data-loyload]').forEach(b=>b.addEventListener('click',()=>{
+        loy.currentId = b.getAttribute('data-loyload');
+        loy.els.id.value = loy.currentId;
+        loyRenderTray(loy.players[loy.currentId]||null);
+      }));
+      const totalRewards = entries.reduce((a,[,p])=> a + (p.rewards||0), 0);
+      loy.els.stats.textContent = `Players: ${entries.length} • Rewards banked: ${totalRewards}`;
+    }
+
+    async function loyaltyLoad(){
+      try{
+        const data = await api('list');
+        loy.players = data.players || {};
+        loySetStatus('Cloud sync: loaded.', true);
+      }catch(e){
+        loySetStatus('Cloud error. Check deployment access.', false);
+      }
+      loyRenderTable();
+      loyRenderTray(loy.currentId ? loy.players[loy.currentId] : null);
+    }
+
+    async function loyaltyAddPunch(){
+      const id = (loy.els.id.value||'').trim();
+      if(!id) return loySetStatus('Enter a player name.', false);
+      if (loy.visitPunched.includes(id)) {
+        return loySetStatus('This player already got a punch this visit. Start a New Visit to punch again.', false);
+      }
+      const inc = isDoubleTuesday() ? 2 : 1;
+      try{
+        const out = await api('punch', { id, inc, cooldownHours: DAILY_LIMIT_HOURS, required: REQUIRED_PUNCHES });
+        if (out.error && out.error==='cooldown') {
+          return loySetStatus('Server cooldown hit. Try again later or disable cooldown in script.', false);
+        }
+        loy.players[id] = out.player;
+        loy.currentId = id;
+        loy.visitPunched.push(id);
+        saveVisit();
+        loySetStatus(`Punch added (${(out.player.punches||0)}/${REQUIRED_PUNCHES}).${inc===2?' (Double Tuesday!)':''}`, true);
+      }catch(e){
+        loySetStatus('Failed to add punch (network?).', false);
+      }
+      loyRenderTable(); loyRenderTray(loy.players[id]);
+    }
+
+    async function loyaltyUndo(){
+      const id = (loy.els.id.value||'').trim();
+      if(!id) return loySetStatus('Enter a player id.', false);
+      try{
+        const out = await api('undo', { id });
+        loy.players[id] = out.player;
+        loy.currentId = id;
+        // Allow re-punch in this visit after undo
+        loy.visitPunched = loy.visitPunched.filter(x=>x!==id);
+        saveVisit();
+        loySetStatus('Removed one punch.', true);
+      }catch(e){
+        loySetStatus('Failed to remove punch.', false);
+      }
+      loyRenderTable(); loyRenderTray(loy.players[id]);
+    }
+
+    function openRewardWizard(){
+      const item = {
+        id:'loy-reward',
+        name:'🎁 Loyalty Reward: Café Feast',
+        price:0, type:'bundle',
+        pizzasIncluded:2, drinksIncluded:0, allow:'classic'
+      };
+      openComboWizard(item, 1);
+    }
+
+    async function loyaltyRedeem(){
+      const id = (loy.els.id.value||'').trim();
+      if(!id) return loySetStatus('Enter a player id.', false);
+      try{
+        const out = await api('redeem', { id });
+        if(out.error){ loySetStatus('No rewards banked for this player.', false); return; }
+        loy.players[id] = out.player;
+        loy.currentId = id;
+        loySetStatus('Reward redeemed! Pick your free drinks.', true);
+        openRewardWizard();
+      }catch(e){
+        loySetStatus('Failed to redeem reward.', false);
+      }
+      loyRenderTable(); loyRenderTray(loy.players[id]);
+    }
+
+    function loyaltyExport(){
+      const blob = new Blob([JSON.stringify({players:loy.players},null,2)],{type:'application/json'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='beanmachine_loyalty_backup.json'; a.click();
+    }
+
+    function loyaltyBind(){
+      loy.els.add.addEventListener('click', loyaltyAddPunch);
+      loy.els.undo.addEventListener('click', loyaltyUndo);
+      loy.els.redeem.addEventListener('click', loyaltyRedeem);
+      loy.els.exportBtn.addEventListener('click', loyaltyExport);
+    }
+    function loyaltyRenderAll(){ loyaltyLoad(); }
+
+    // ---------- Init ----------
+    renderAll();
+    loyaltyBind();
+  </script>
+</body>
+</html>
