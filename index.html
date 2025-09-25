@@ -741,8 +741,7 @@
           btn.addEventListener('click',()=>{
             const id=btn.getAttribute('data-plus');
             const usedNow=Object.values(counts).reduce((a,b)=>a+b,0);
-            if(usedNow<drinksNeeded){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value=c
-ounts[id]; renderGrid(); }
+            if(usedNow<drinksNeeded){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value=counts[id]; renderGrid(); }
           });
         });
         comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
