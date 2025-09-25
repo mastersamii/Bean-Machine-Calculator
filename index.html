@@ -303,24 +303,24 @@
       classic: [
         { id:'bev-bean', name:'☕ Bean Coffee',   price:30,  type:'drink' },
         { id:'bev-esp',  name:'⚡ Espresso',      price:40,  type:'drink' },
-        { id:'bev-iced', name:'🧊 Iced Latte',    price:50,  type:'drink' },
-        { id:'bev-choc', name:'🍫 Hot Chocolate', price:115, type:'drink' },
+        { id:'bev-iced', name:'🧊 Iced Latte',    price:40,  type:'drink' },
+        { id:'bev-choc', name:'🍫 Hot Chocolate', price:100, type:'drink' },
       ],
       bundles: [
         { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:250, type:'bundle', drinksIncluded:5,
-          description:'Pick any 5 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 5 Wonder Waffles.' },
+          description:'Pick any 5 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 5 Wonder Waffles.' },
         { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:450, type:'bundle', drinksIncluded:10,
-          description:'Pick any 10 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 10 Wonder Waffles.' },
+          description:'Pick any 10 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 10 Wonder Waffles.' },
 
         // Bean Box & Refill
         { id:'pk-beanbox',
           name:'🍱 Bean Box: Large Meal + Lunch Box',
           price:900, type:'bundle', drinksIncluded:10,
-          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick 🩷🍋 Pink Lemonade, Bean Coffee, or Espresso. Iced Latte allowed with +$15 each.' },
+          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick Pink Lemonade, Bean Coffee, or Espresso. Iced Latte allowed with +$10 each.' },
         { id:'rf-beanbox',
           name:'🍱 Bean Box Refill: 10 Drinks + 10 Waffles',
           price:350, type:'bundle', drinksIncluded:10,
-          description:'10 drinks + 10 waffles. Iced Latte +$15 each.' },
+          description:'10 drinks + 10 waffles. Iced Latte +$10 each.' },
 
         { id:'sp-hay',   name:'Hayward Special', price:2700, type:'bundle',
           description:'10 Wonder Waffles + 10 Iced Lattes + 2 Cakes of your choice.' },
@@ -335,9 +335,9 @@
         { id:'ex-donut',  name:'🍩 Donut',          price:20,  type:'extra' },
         { id:'ex-waffle', name:'🧇 Wonder Waffle',  price:20,  type:'extra' },
 
-        { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:30, type:'extra', isCake:true },
-        { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:30, type:'extra', isCake:true },
-        { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:30, type:'extra', isCake:true },
+        { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:150, type:'extra', isCake:true },
+        { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:150, type:'extra', isCake:true },
+        { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:150, type:'extra', isCake:true },
 
         { id:'ex-cheese', name:'🍰 Cheesecake',     price:30,  type:'extra' },
         { id:'ex-kinder', name:'🥚 Kinder Egg',     price:1500, type:'extra' },
@@ -776,7 +776,7 @@
       comboNext.onclick=()=>{
         if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
         const icedCount=(counts['bev-iced']||0);
-        const upcharge=15*icedCount;
+        const upcharge=10*icedCount;
         const fmt=id=>(findMenuItem(id)||{}).name||id;
         const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
         const meta=drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
