@@ -214,7 +214,7 @@
           <div id="tab-loyalty" role="tabpanel" hidden>
             <div class="option" style="margin-bottom:10px;">
               <div>
-                <div><strong>Loyalty Manager — Bean Machine</strong></div>
+                <div><strong>Loyalty Manager Bean Machine</strong></div>
                 <div class="small">10 punches → Reward: Large Meal (10 drinks + 10 waffles) + 2 Cheesecakes.</div>
                 <div class="small" id="dpStatus">Double Punch Tuesday: auto on Tuesdays</div>
               </div>
@@ -648,7 +648,7 @@
         const renderCakeGrid=()=>{
           const used=Object.values(cakeCounts).reduce((a,b)=>a+b,0);
           const remaining=cakesNeeded-used;
-          comboTitle.textContent=`Cakes — pick ${cakesNeeded} (remaining ${Math.max(0,remaining)})`;
+          comboTitle.textContent=`Cakes: pick ${cakesNeeded} (remaining ${Math.max(0,remaining)})`;
           comboSteps.innerHTML = confirmMode?'1. Cakes · <strong>2. Confirm</strong>':'<strong>1. Cakes</strong> · 2. Confirm';
           comboContent.innerHTML = `
             <div class="selector-grid">
@@ -723,7 +723,7 @@
       const renderGrid=()=>{
         const used=Object.values(counts).reduce((a,b)=>a+b,0);
         const remaining=drinksNeeded-used;
-        comboTitle.textContent=`Drinks — pick ${drinksNeeded} (remaining ${Math.max(0,remaining)})`;
+        comboTitle.textContent=`Drinks: pick ${drinksNeeded} (remaining ${Math.max(0,remaining)})`;
         comboSteps.innerHTML = confirmMode?'1. Drinks · <strong>2. Confirm</strong>':'<strong>1. Drinks</strong> · 2. Confirm';
         comboContent.innerHTML = `
           <div class="selector-grid">
