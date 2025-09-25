@@ -85,7 +85,7 @@
     .order-card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:6px; }
     .cart-item{ display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center; padding:8px; border-bottom:1px dashed var(--border); }
     .cart-item:last-child{ border-bottom:none; }
-    .small{ font-size:.85rem; color:.var(--muted); }
+    .small{ font-size:.85rem; color:var(--muted); }
 
     .tabs{ display:flex; gap:8px; margin-bottom:10px; }
     .tabs .btn[aria-selected="true"]{ outline:2px solid var(--accent); }
@@ -338,58 +338,58 @@
   <script>
     // ---------- Data ----------
     const MENU = {
-      // Treat these as "base beverages" (formerly pizzas) so the wizard works unchanged.
+      // Base beverages
       classic: [
-        { id: 'bev-bean', name: '☕ Bean Coffee',  price: 30, type:'pizza' },
-        { id: 'bev-capp', name: '🥛 Cappuccino',  price: 40, type:'pizza' },
-        { id: 'bev-iced', name: '🧊 Iced Latte',  price: 50, type:'pizza' },
-        { id: 'bev-esp',  name: '⚡ Espresso',     price: 40, type:'pizza' },
-        { id: 'bev-choc', name: '🍫 Hot Chocolate',price: 115, type:'pizza' },
+        { id: 'bev-bean', name: '☕ Bean Coffee',   price: 30,  type:'drink' },
+        { id: 'bev-esp',  name: '⚡ Espresso',      price: 40,  type:'drink' },
+        { id: 'bev-iced', name: '🧊 Iced Latte (+$15 in meals)', price: 50, type:'drink' },
+        { id: 'bev-choc', name: '🍫 Hot Chocolate', price: 115, type:'drink' },
       ],
-      // We don't need specialty vs classic here, so keep specialty empty.
-      specialty: [],
-      // Bundles & specials (some open a wizard to pick drink types)
-      bundles: [
-        // Simple new café meals (wizard to pick DRINKS; waffles auto-added)
-        { id: 'bd-med',  name:'🥐 Medium Café Meal: 1 Drink + 1 Waffle', price: 50, type:'bundle', pizzasIncluded:1, allow:'classic', drinksIncluded:0, description:'Pick any 1 drink. Comes with 1 Wonder Waffle (included).'},
-        { id: 'bd-large',name:'🥐 Large Café Meal: 2 Drinks + 2 Waffles', price: 95, type:'bundle', pizzasIncluded:2, allow:'classic', drinksIncluded:0, description:'Pick any 2 drinks. Comes with 2 Wonder Waffles (included).'},
 
-        // Screenshot specials (fixed-price; no wizard)
-        { id:'sp-10x10', name:'10×10 Special', price:600, type:'bundle', description:'10 Pink Lemonades / Iced Lattes + 10 Wonder Waffles.'},
-        { id:'sp-hay',   name:'Hayward Special', price:2700, type:'bundle', description:'4 “10×10 with Iced Lattes” + 2 Cakes of your choosing.'},
-        { id:'sp-kids',  name:"Kids Meal with Toy", price:2000, type:'bundle', description:'5 Wonder Waffles + 5 Hot Chocolates.'},
+      // Bundles & specials
+      bundles: [
+        // Medium/ Large meals
+        { id: 'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price: 250,  type:'bundle', drinksIncluded:5,  description:'Pick any 5 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 5 Wonder Waffles.'},
+        { id: 'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price: 450,  type:'bundle', drinksIncluded:10, description:'Pick any 10 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 10 Wonder Waffles.'},
+
+        // Hayward Special
+        { id:'sp-hay',   name:'Hayward Special', price:2700, type:'bundle', description:'10 Wonder Waffles + 10 Iced Lattes + 2 Cakes of your choice.'},
+
+        // Kids Meal 
+        { id:'sp-kids',  name:"Kids Meal with Toy", price:2200, type:'bundle', description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.'},
       ],
-      // Ready-made bakes & drinks
+
+      // Ready-made bakes & other drinks
       extras: [
-        { id: 'ex-lemon', name: '🩷 Pink Lemonade', price: 35, type: 'extra', isDrink: true },
-        { id: 'ex-cup',   name: '🧁 Cupcake',       price: 25, type: 'extra' },
-        { id: 'ex-cookie',name: '🍪 Cream Cookie',  price: 25, type: 'extra' },
-        { id: 'ex-cheese',name: '🍰 Cheesecake',    price: 30, type: 'extra' },
-        { id: 'ex-donut', name: '🍩 Donut',         price: 20, type: 'extra' },
-        { id: 'ex-waffle',name: '🧇 Wonder Waffle', price: 20, type: 'extra' },
-        { id: 'ex-bag',   name: '🛍️ Paper Bag',    price: 1,  type: 'extra' },
-        { id: 'ex-lunch', name: '🍱 Lunch Box',     price: 450, type: 'extra' },
+        { id: 'ex-lemon',  name: '🩷 Pink Lemonade', price: 35,  type: 'extra', isDrink: true },
+        { id: 'ex-cup',    name: '🧁 Cupcake',       price: 25,  type: 'extra' },
+        { id: 'ex-cookie', name: '🍪 Cream Cookie',  price: 25,  type: 'extra' },
+        { id: 'ex-cheese', name: '🍰 Cheesecake',    price: 30,  type: 'extra' },
+        { id: 'ex-donut',  name: '🍩 Donut',         price: 20,  type: 'extra' },
+        { id: 'ex-waffle', name: '🧇 Wonder Waffle', price: 20,  type: 'extra' },
+        { id: 'ex-kinder', name: '🥚 Kinder Egg',    price: 1500, type: 'extra' },
+        { id: 'ex-lunch',  name: '🍱 Lunch Box',     price: 450, type: 'extra' },
       ],
-      // Unused sections kept for structural parity
+
+      specialty: [],
       deals: [],
       packs: [],
     };
 
-    // Ingredient recipes (from screenshot)
+    // Ingredient recipes
     const RECIPE_MAP = {
       'bev-bean': { 'Water':2, 'Coffee bag':1 },
-      'bev-capp': { 'Coffee bag':1, 'Water':1, 'Milk':1 },
+      'bev-capp': { 'Coffee bag':1, 'Water':1, 'Milk':1 }, 
       'bev-iced': { 'Coffee bag':1, 'Sugar':1, 'Milk':1, 'Water':1 },
       'bev-esp' : { 'Coffee bag':2, 'Water':2 },
       'bev-choc': { 'Milk':2, 'Sugar':2, 'Cocoa Powder':4 },
-      // Bakes can be added here later as needed
     };
 
     const currency = n => `$${n.toFixed(2)}`;
 
     // ---------- State ----------
-    const STATE_KEY = 'beanmachine_state_v1';
-    const HIST_KEY  = 'beanmachine_history_v1';
+    const STATE_KEY = 'beanmachine_state_v2';
+    const HIST_KEY  = 'beanmachine_history_v2';
 
     const state = {
       cart: [],
@@ -397,7 +397,7 @@
       history: [],
       fulfillment: 'pickup',
       deliveryZone: 'city',
-      pizzaSavers: 0
+      sundaySavers: 0
     };
 
     try {
@@ -409,7 +409,7 @@
         if (typeof saved.discountPct === 'number') state.discountPct = saved.discountPct;
         if (saved.fulfillment) state.fulfillment = saved.fulfillment;
         if (saved.deliveryZone) state.deliveryZone = saved.deliveryZone;
-        if (typeof saved.pizzaSavers === 'number') state.pizzaSavers = saved.pizzaSavers;
+        if (typeof saved.sundaySavers === 'number') state.sundaySavers = saved.sundaySavers;
       }
     } catch {}
 
@@ -419,7 +419,7 @@
         discountPct: state.discountPct,
         fulfillment: state.fulfillment,
         deliveryZone: state.deliveryZone,
-        pizzaSavers: state.pizzaSavers
+        sundaySavers: state.sundaySavers
       }));
     const persistHistory = () => localStorage.setItem(HIST_KEY, JSON.stringify(state.history));
 
@@ -429,19 +429,19 @@
       for (const pool of pools){ const f = pool.find(x=>x.id===id); if (f) return f; }
       return null;
     }
-    function getDrinkPool(){ 
-      // Drinks include base beverages and Pink Lemonade (in extras)
-      return [...MENU.classic, ...MENU.extras.filter(x=>x.isDrink)];
+
+    // Drinks allowed for meals: Pink Lemonade, Bean Coffee, Espresso (+ Iced for upcharge)
+    function getMealDrinkPool(){
+      const base = [
+        ...MENU.classic.filter(x => x.id==='bev-bean' || x.id==='bev-esp' || x.id==='bev-iced'),
+        ...MENU.extras.filter(x => x.id==='ex-lemon')
+      ];
+      return base;
     }
-    function getPizzaPool(allow){
-      // Beverages act as "pizzas" for the wizard
-      return MENU.classic;
-    }
-    function isSpecialtyId(pid){ return false; } // not used
 
     // ---------- Cards ----------
     function cardHTML(item){
-      const needsCombo = (item.pizzasIncluded||0) > 0 || (item.drinksIncluded||0) > 0;
+      const needsCombo = (item.drinksIncluded||0) > 0;
       return `
         <article class="card">
           <h3>${item.name}</h3>
@@ -493,12 +493,18 @@
           const item = allItems.find(i=>i.id===addId);
           card.querySelector('[data-add]').addEventListener('click',()=>{
             addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:count, type:item.type });
-            // Auto-add included waffles for our Medium/Large Café Meals
-            if (item.id==='bd-med') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:1*count, type:'extra', meta:'Meal' });
-            if (item.id==='bd-large') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:2*count, type:'extra', meta:'Meal' });
+
+            // Auto additions for specials
             if (item.id==='sp-kids') {
-              addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Special)', unitPrice:0, qty:5*count, type:'extra', meta:'Kids Meal' });
-              addToCart({ id:'bev-choc', name:'🍫 Hot Chocolate (Special)', unitPrice:0, qty:5*count, type:'pizza', meta:'Kids Meal' });
+              addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Kids)', unitPrice:0, qty:5*count, type:'extra', meta:'Kids Meal' });
+              addToCart({ id:'bev-choc', name:'🍫 Hot Chocolate (Kids)', unitPrice:0, qty:5*count, type:'drink', meta:'Kids Meal' });
+              addToCart({ id:'ex-kinder', name:'🥚 Kinder Egg (Kids)', unitPrice:0, qty:1*count, type:'extra', meta:'Kids Meal' });
+            }
+            if (item.id==='sp-hay') {
+              addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Hayward)', unitPrice:0, qty:10*count, type:'extra', meta:'Hayward Special' });
+              addToCart({ id:'bev-iced', name:'🧊 Iced Latte (Hayward)', unitPrice:0, qty:10*count, type:'drink', meta:'Hayward Special' });
+              // Cakes are included but cost unknown; add placeholders
+              addToCart({ id:'cake-1', name:'🎂 Cake (Choice)', unitPrice:0, qty:2*count, type:'extra', meta:'Hayward Special' });
             }
           });
         }
@@ -567,7 +573,7 @@
     function isSunday(){ return new Date().getDay() === 0; }
     function renderPizzaSaver(){
       const chip = document.getElementById('saverChip');
-      chip.textContent = `Savers: ${state.pizzaSavers} (−$50 ea)`;
+      chip.textContent = `Savers: ${state.sundaySavers} (−$50 ea)`;
       const addBtn = document.getElementById('addSaverBtn');
       const rmBtn = document.getElementById('removeSaverBtn');
       const clrBtn = document.getElementById('clearSaverBtn');
@@ -581,24 +587,24 @@
         help.textContent = 'Unavailable today (Sundays only)';
       }
 
-      const has = state.pizzaSavers > 0;
+      const has = state.sundaySavers > 0;
       rmBtn.disabled = !has;
       clrBtn.disabled = !has;
     }
     document.getElementById('addSaverBtn').addEventListener('click', ()=>{
       if (!isSunday()) return;
-      state.pizzaSavers += 1;
+      state.sundaySavers += 1;
       persist(); renderPizzaSaver(); renderTotals();
     });
     document.getElementById('removeSaverBtn').addEventListener('click', ()=>{
-      if (state.pizzaSavers > 0) {
-        state.pizzaSavers -= 1;
+      if (state.sundaySavers > 0) {
+        state.sundaySavers -= 1;
         persist(); renderPizzaSaver(); renderTotals();
       }
     });
     document.getElementById('clearSaverBtn').addEventListener('click', ()=>{
-      if (state.pizzaSavers > 0) {
-        state.pizzaSavers = 0;
+      if (state.sundaySavers > 0) {
+        state.sundaySavers = 0;
         persist(); renderPizzaSaver(); renderTotals();
       }
     });
@@ -609,10 +615,10 @@
       let notes = [];
       let discount = 0;
 
-      // Weekdays (Mon–Wed): BOGO 50% on drinks
+      // Mon–Wed: BOGO 50% on drinks
       if (day>=1 && day<=3){
         const unitPrices = [];
-        state.cart.forEach(l=>{ if (l.type === 'pizza'){ for(let i=0;i<l.qty;i++) unitPrices.push(l.unitPrice); } });
+        state.cart.forEach(l=>{ if (l.type === 'drink'){ for(let i=0;i<l.qty;i++) unitPrices.push(l.unitPrice); } });
         if (unitPrices.length >= 2){
           unitPrices.sort((a,b)=>b-a);
           for (let i=0;i<unitPrices.length; i+=2){
@@ -623,26 +629,26 @@
         }
       }
 
-      // Thu–Sat: Free donut with each 10×10 special (max 4)
+      // Thu–Sat: Free donut with Hayward Special (max 4 per special if the order has donuts)
       if (day>=4 && day<=6){
-        const tenQty = state.cart.reduce((s,l)=> s + ((l.id==='sp-10x10')?l.qty:0), 0);
-        if (tenQty>0){
+        const hayQty = state.cart.reduce((s,l)=> s + ((l.id==='sp-hay')?l.qty:0), 0);
+        if (hayQty>0){
           const donut = state.cart.find(l=>l.id==='ex-donut');
           if (donut){
-            const freeQty = Math.min(4*tenQty, donut.qty);
+            const freeQty = Math.min(4*hayQty, donut.qty);
             if (freeQty>0){
               discount += freeQty * donut.unitPrice;
-              notes.push(`Thu–Sat free donuts (${freeQty}) with 10×10 special`);
+              notes.push(`Thu–Sat free donuts (${freeQty}) with Hayward Special`);
             }
           }
         }
       }
 
       // Sunday saver
-      if (day===0 && state.pizzaSavers>0){
-        const saverDiscount = 50 * state.pizzaSavers;
+      if (day===0 && state.sundaySavers>0){
+        const saverDiscount = 50 * state.sundaySavers;
         discount += saverDiscount;
-        notes.push(`Bean Saver Sunday: ${state.pizzaSavers}×$50`);
+        notes.push(`Bean Saver Sunday: ${state.sundaySavers}×$50`);
       }
 
       return { discount: +(discount.toFixed(2)), notes };
@@ -710,7 +716,7 @@
       list.querySelectorAll('[data-reorder]').forEach(btn=>btn.addEventListener('click',()=>{
         const id = +btn.getAttribute('data-reorder');
         const h = state.history.find(x=>x.id===id); if(!h) return;
-        h.items.forEach(it => addToCart({ id: it.id || null, name: it.name, unitPrice: it.unit, qty: it.qty, meta: it.meta || null, combo: it.combo || null, drinks: it.drinks || null }));
+        h.items.forEach(it => addToCart({ id: it.id || null, name: it.name, unitPrice: it.unit, qty: it.qty, meta: it.meta || null, combo: it.combo || null, drinks: it.drinks || null, type: it.type || 'extra' }));
       }));
       list.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',()=>{
         const id = +btn.getAttribute('data-delete');
@@ -733,7 +739,7 @@
     }
     tabButtons.forEach(b=>b.addEventListener('click',()=>selectTab(b.getAttribute('data-tab'))));
 
-    // ---------- Wizard (pick drink types for our meals) ----------
+    // ---------- Wizard (pick drinks for Medium/Large) ----------
     const comboModal = document.getElementById('comboModal');
     const comboTitle = document.getElementById('comboTitle');
     const comboSteps = document.getElementById('comboSteps');
@@ -743,23 +749,20 @@
     document.getElementById('closeCombo').addEventListener('click', ()=> comboModal.close());
 
     function openComboWizard(item, qty){
-      const beveragesNeeded = item.pizzasIncluded || 0; // repurpose
-      const drinkPool = getDrinkPool();
+      const drinksNeeded = item.drinksIncluded || 0;
+      const pool = getMealDrinkPool();
 
-      const drinkCounts = {};
-      let step = 0; // single-step wizard (drinks), then confirm
+      const counts = {};
+      let step = 0;
 
       const renderSteps = ()=>{
-        const parts = [];
-        if (beveragesNeeded>0) parts.push(step===0?'<strong>1. Drinks</strong>':'1. Drinks');
-        parts.push(step===1?'<strong>2. Confirm</strong>':'2. Confirm');
-        comboSteps.innerHTML = parts.join(' · ');
+        comboSteps.innerHTML = (step===0?'<strong>1. Drinks</strong>':'1. Drinks') + ' · ' + (step===1?'<strong>2. Confirm</strong>':'2. Confirm');
       };
 
-      const renderGrid = (pool, counts, needed, label)=>{
+      const renderGrid = ()=>{
         const used = Object.values(counts).reduce((a,b)=>a+b,0);
-        const remaining = needed - used;
-        comboTitle.textContent = `${label} — pick ${needed} (remaining ${Math.max(0,remaining)})`;
+        const remaining = drinksNeeded - used;
+        comboTitle.textContent = `Drinks — pick ${drinksNeeded} (remaining ${Math.max(0,remaining)})`;
         comboContent.innerHTML = `
           <div class="selector-grid">
             ${pool.map(p=>`
@@ -777,7 +780,7 @@
           btn.addEventListener('click',()=>{
             const id = btn.getAttribute('data-plus');
             const currentUsed = Object.values(counts).reduce((a,b)=>a+b,0);
-            if (currentUsed < needed){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value = counts[id]; renderGrid(pool, counts, needed, label); }
+            if (currentUsed < drinksNeeded){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value = counts[id]; renderGrid(); }
           });
         });
         comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
@@ -785,7 +788,7 @@
             const id = btn.getAttribute('data-minus');
             counts[id]=Math.max(0,(counts[id]||0)-1);
             comboContent.querySelector(`[data-out="${id}"]`).value = counts[id];
-            renderGrid(pool, counts, needed, label);
+            renderGrid();
           });
         });
         comboPrev.style.display = 'none';
@@ -796,7 +799,7 @@
       const renderConfirm = ()=>{
         comboTitle.textContent = item.name || 'Confirm Selection';
         const fmtName = (id)=> (findMenuItem(id)||{}).name || id;
-        const drinkList = Object.entries(drinkCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
+        const drinkList = Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
         const info = (findMenuItem(item.id)?.description)||'';
         comboContent.innerHTML = `
           <div class="summary" style="gap:10px;">
@@ -816,22 +819,34 @@
         if (step===0){ step=1; renderConfirm(); return; }
 
         // finalize
-        const drinkIds = toArrayByCounts(drinkCounts);
+        const drinkIds = toArrayByCounts(counts);
         const fmtName = (id)=> (findMenuItem(id)||{}).name || id;
-        const drinkParts = Object.entries(drinkCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
+        const drinkParts = Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmtName(id)} x${c}`);
         const meta = drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
 
-        addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:qty||1, type:item.type, drinks: drinkCounts, meta });
+        // Apply iced-latte upcharge inside meals: +$15 per iced latte
+        const icedCount = (counts['bev-iced']||0);
+        const upcharge = 15 * icedCount;
 
-        // Auto-add included waffles
-        if (item.id==='bd-med') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:1*(qty||1), type:'extra', meta:'Meal' });
-        if (item.id==='bd-large') addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:2*(qty||1), type:'extra', meta:'Meal' });
+        addToCart({
+          id:item.id,
+          name:item.name + (upcharge>0?` (+$${upcharge} iced upcharge)`:''),
+          unitPrice:(item.price + upcharge),
+          qty:qty||1,
+          type:item.type,
+          drinks: counts,
+          meta
+        });
+
+        // Auto-add included waffles (show as $0 lines)
+        const waffles = item.id==='bd-med' ? 5 : (item.id==='bd-large' ? 10 : 0);
+        if (waffles>0) addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:waffles*(qty||1), type:'extra', meta:'Meal' });
 
         comboModal.close();
       };
 
       renderSteps();
-      renderGrid(drinkPool, drinkCounts, beveragesNeeded, 'Drinks');
+      renderGrid();
       comboModal.showModal();
     }
 
@@ -841,7 +856,7 @@
       const add = (name, n=1)=>{ if(!name) return; tally[name] = (tally[name]||0)+n; };
 
       state.cart.forEach(line=>{
-        if((line.type==='pizza' || line.type==='extra') && line.id && RECIPE_MAP[line.id]){
+        if((line.type==='drink' || line.type==='extra') && line.id && RECIPE_MAP[line.id]){
           Object.entries(RECIPE_MAP[line.id]).forEach(([ing,count])=> add(ing, count*line.qty));
         }
       });
@@ -887,20 +902,20 @@
       const total = +(subtotal + deliveryFee - manual - promo.discount).toFixed(2);
       const entry = {
         id: Date.now(),
-        items: state.cart.map(l=>({ id: l.id || null, name: l.name, qty: l.qty, unit: l.unitPrice, meta: l.meta||null, combo: l.combo||null, drinks: l.drinks||null, lineTotal:+(l.unitPrice*l.qty).toFixed(2) })),
+        items: state.cart.map(l=>({ id: l.id || null, name: l.name, qty: l.qty, unit: l.unitPrice, meta: l.meta||null, combo: l.combo||null, drinks: l.drinks||null, type:l.type||'extra', lineTotal:+(l.unitPrice*l.qty).toFixed(2) })),
         discountPct: state.discountPct,
         subtotal:+subtotal.toFixed(2),
         deliveryFee,
         promoDiscount: promo.discount,
         manualDiscount: manual,
-        pizzaSavers: state.pizzaSavers,
+        sundaySavers: state.sundaySavers,
         total
       };
       state.history.unshift(entry); persistHistory();
 
       state.cart = [];
       state.discountPct = 0;
-      state.pizzaSavers = 0;
+      state.sundaySavers = 0;
       persist();
       renderAll();
       newVisit(true);
@@ -909,7 +924,7 @@
     function resetAll(){
       state.cart = [];
       state.discountPct = 0;
-      state.pizzaSavers = 0;
+      state.sundaySavers = 0;
       persist(); renderAll(); renderIngredients();
     }
 
@@ -929,7 +944,7 @@
     applyTheme(localStorage.getItem('beanmachine_theme') || 'light');
     themeBtn.addEventListener('click',()=>{ const next = (localStorage.getItem('beanmachine_theme')||'light')==='light' ? 'dark' : 'light'; applyTheme(next); });
 
-    // ---------- LOYALTY (same API contract) ----------
+    // ---------- LOYALTY ----------
     const API_URL = 'https://script.google.com/macros/s/AKfycbzV2Rm1bdRN6Be_qBPMoGmXORVG8rRBLTeAnS_agrKm-nxRUNQr9smsozc3CviAynvrjQ/exec';
 
     const REQUIRED_PUNCHES = 10;
@@ -1092,12 +1107,7 @@
     }
 
     function openRewardWizard(){
-      const item = {
-        id:'loy-reward',
-        name:'🎁 Loyalty Reward: Café Feast',
-        price:0, type:'bundle',
-        pizzasIncluded:2, drinksIncluded:0, allow:'classic'
-      };
+      const item = { id:'loy-reward', name:'🎁 Loyalty Reward: Café Feast', price:0, type:'bundle', drinksIncluded:2 };
       openComboWizard(item, 1);
     }
 
