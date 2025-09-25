@@ -285,11 +285,8 @@
 
   <script>
     // ---------- Config ----------
-    // Mon–Wed: 20% percent off the *second* Medium Meal
-    const MW_SECOND_OFF = 0.20;
-
-    // Thu–Sat: freebies per Large Meal
-    const WEEKEND_FREEBIES_PER_LARGE = 5;
+    const MW_SECOND_OFF = 0.20;           // Mon–Wed: percent off second Medium
+    const WEEKEND_FREEBIES_PER_LARGE = 5; // Thu–Sat freebies per Large
 
     // ---------- Data ----------
     const MENU = {
@@ -301,39 +298,53 @@
       ],
       bundles: [
         { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:250, type:'bundle', drinksIncluded:5,
-          description:'Pick any 5 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 5 Wonder Waffles.' },
+          description:'Pick any 5 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 5 Wonder Waffles.' },
         { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:450, type:'bundle', drinksIncluded:10,
-          description:'Pick any 10 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 10 Wonder Waffles.' },
+          description:'Pick any 10 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 10 Wonder Waffles.' },
         { id:'sp-hay',   name:'Hayward Special', price:2700, type:'bundle',
           description:'10 Wonder Waffles + 10 Iced Lattes + 2 Cakes of your choice.' },
         { id:'sp-kids',  name:'Kids Meal with Toy', price:2200, type:'bundle',
           description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.' },
       ],
       extras: [
-        { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:35,  type:'extra', isDrink:true },
-        { id:'ex-cup',    name:'🧁 Cupcake',       price:25,  type:'extra' },
-        { id:'ex-cookie', name:'🍪 Cream Cookie',  price:25,  type:'extra' },
-        { id:'ex-cheese', name:'🍰 Cheesecake',    price:30,  type:'extra', isCake:true },
-        { id:'ex-donut',  name:'🍩 Donut',         price:20,  type:'extra' },
-        { id:'ex-waffle', name:'🧇 Wonder Waffle', price:20,  type:'extra' },
-        { id:'ex-kinder', name:'🥚 Kinder Egg',    price:1500, type:'extra' },
-        { id:'ex-lunch',  name:'🍱 Lunch Box',     price:450, type:'extra' },
+        { id:'ex-lemon',  name:'🩷🍋 Pink Lemonade', price:35,  type:'extra', isDrink:true },
+
+        { id:'ex-cup',    name:'🧁 Cupcake',        price:25,  type:'extra' },
+        { id:'ex-cookie', name:'🍪 Cream Cookie',   price:25,  type:'extra' },
+        { id:'ex-donut',  name:'🍩 Donut',          price:20,  type:'extra' },
+        { id:'ex-waffle', name:'🧇 Wonder Waffle',  price:20,  type:'extra' },
+
+        <!-- Cakes sold individually -->
+        { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:30, type:'extra', isCake:true },
+        { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:30, type:'extra', isCake:true },
+        { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:30, type:'extra', isCake:true },
+
+        { id:'ex-cheese', name:'🍰 Cheesecake',     price:30,  type:'extra' },  // keeps loyalty reward
+        { id:'ex-kinder', name:'🥚 Kinder Egg',     price:1500, type:'extra' },
+        { id:'ex-lunch',  name:'🍱 Lunch Box',      price:450,  type:'extra' },
       ],
       specialty:[], deals:[], packs:[],
     };
 
+    // Recipes (per one item)
     const RECIPE_MAP = {
+      // Drinks
       'bev-bean': {'Water':2,'Coffee bag':1},
       'bev-iced': {'Coffee bag':1,'Sugar':1,'Milk':1,'Water':1},
       'bev-esp' : {'Coffee bag':2,'Water':2},
       'bev-choc': {'Milk':2,'Sugar':2,'Cocoa Powder':4},
+      // Cakes
+      'ex-cake-berry': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cherry':1,'Strawberry':1},
+      'ex-cake-lemon': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Lemon':2},
+      'ex-cake-choc' : {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cocoa Powder':2},
+      // (Add more here as you decide)
     };
 
     const currency = n => `$${n.toFixed(2)}`;
 
     // ---------- State ----------
-    const STATE_KEY = 'beanmachine_state_v4';
-    const HIST_KEY  = 'beanmachine_history_v4';
+    const STATE_KEY = 'beanmachine_state_v5';
+    const HIST_KEY  = 'beanmachine_history_v5';
 
     const state = { cart:[], discountPct:0, history:[], fulfillment:'pickup', deliveryZone:'city' };
 
@@ -364,7 +375,49 @@
         ...MENU.extras.filter(x=>x.id==='ex-lemon')
       ];
     }
-    function getCakePool(){ return MENU.extras.filter(x=>x.isCake); }
+    function getCakePool(){ return MENU.extras.filter(x=>x.id.startsWith('ex-cake-')); }
+
+    // Ingredient math
+    function addToMap(map, name, count){
+      if(!name || !count) return;
+      map[name] = (map[name]||0) + count;
+    }
+    function mergeRecipe(target, recipe, mult=1){
+      if(!recipe) return;
+      for(const [k,v] of Object.entries(recipe)) addToMap(target, k, v*mult);
+    }
+
+    // Build ingredient totals for one cart line (handles bundles/wizards)
+    function buildLineIngredients(line){
+      const tally = {};
+
+      // Direct recipe (e.g., Espresso, Hot Chocolate, Cakes)
+      if(RECIPE_MAP[line.id]) mergeRecipe(tally, RECIPE_MAP[line.id], line.qty);
+
+      // Meal drinks chosen via wizard (bd-med / bd-large / loyalty reward)
+      if(line.drinks){
+        for(const [drinkId,c] of Object.entries(line.drinks)){
+          if(RECIPE_MAP[drinkId]) mergeRecipe(tally, RECIPE_MAP[drinkId], c*(line.qty||1));
+        }
+      }
+
+      // Hayward: 10 Iced Lattes + selected cakes (shown on the Hayward bundle line)
+      if(line.id==='sp-hay'){
+        mergeRecipe(tally, RECIPE_MAP['bev-iced'], 10*(line.qty||1));
+        if(line.cakes){
+          for(const [cakeId,c] of Object.entries(line.cakes)){
+            if(RECIPE_MAP[cakeId]) mergeRecipe(tally, RECIPE_MAP[cakeId], c*(line.qty||1));
+          }
+        }
+      }
+
+      return tally;
+    }
+    function fmtIngLine(tally){
+      const entries = Object.entries(tally);
+      if(!entries.length) return '';
+      return 'Ingredients: ' + entries.map(([n,c])=>`${n} x${c}`).join(', ');
+    }
 
     // ---------- Cards ----------
     function cardHTML(item){
@@ -431,11 +484,14 @@
         cart.innerHTML = `<div class="cart-item muted">Your order is empty. Add a drink or bake to get started.</div>`;
         return;
       }
-      cart.innerHTML = state.cart.map((l,idx)=>`
+      cart.innerHTML = state.cart.map((l,idx)=>{
+        const lineIngs = fmtIngLine(buildLineIngredients(l));
+        return `
         <div class="cart-item">
           <div>
             <div><strong>${l.name}</strong></div>
             <div class="small">${currency(l.unitPrice)} each${l.meta?` • ${l.meta}`:''}</div>
+            ${lineIngs?`<div class="small muted">${lineIngs}</div>`:''}
           </div>
           <div class="qty">
             <button data-dec="${idx}">−</button>
@@ -443,8 +499,8 @@
             <button data-inc="${idx}">+</button>
           </div>
           <div><strong>${currency(l.unitPrice*l.qty)}</strong></div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
 
       cart.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{
         const i=+b.getAttribute('data-inc'); state.cart[i].qty++; persist(); renderCart(); renderTotals(); renderIngredients();
@@ -481,17 +537,17 @@
       const day = new Date().getDay(); // 0 Sun .. 6 Sat
       let notes=[]; let discount=0;
 
-      // Mon–Wed: Buy one Medium Café Meal, get the second MW_SECOND_OFF off
+      // Mon–Wed: Buy one Medium, second gets MW_SECOND_OFF
       if(day>=1 && day<=3){
         const med = state.cart.find(l=>l.id==='bd-med');
         if(med && med.qty>=2){
           const pairs = Math.floor(med.qty/2);
           const off = med.unitPrice * MW_SECOND_OFF * pairs;
-          if(off>0){ discount += off; notes.push(`Mon–Wed: ${pairs} Medium Meal half-off${MW_SECOND_OFF!==0.5?` (${MW_SECOND_OFF*100}% off second)`:''}`); }
+          if(off>0){ discount += off; notes.push(`Mon–Wed: ${pairs} Medium Meal ${MW_SECOND_OFF*100}% off second`); }
         }
       }
 
-      // Thu–Sat: per Large Café Meal, 5 free Cupcakes or Cream Cookies
+      // Thu–Sat: freebies per Large Café Meal
       if(day>=4 && day<=6){
         const largeQty = state.cart.reduce((s,l)=> s + (l.id==='bd-large'?l.qty:0), 0);
         if(largeQty>0){
@@ -510,7 +566,7 @@
         }
       }
 
-      // Sunday: (left open — no automatic promo)
+      // Sunday: open (no auto promo)
       return { discount:+discount.toFixed(2), notes };
     }
 
@@ -606,7 +662,7 @@
     document.getElementById('closeCombo').addEventListener('click',()=>comboModal.close());
 
     function openComboWizard(item, qty){
-      // Hayward: choose cakes only
+      // Hayward: choose 2 cakes from the 3 cake types
       if(item.id==='sp-hay'){
         const cakesNeeded = 2*(qty||1);
         const cakePool = getCakePool();
@@ -668,14 +724,13 @@
         comboNext.onclick=()=>{
           if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
           addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:qty||1, type:item.type, cakes:cakeCounts, meta:'Includes 10 Iced Lattes + 10 Waffles' });
+          // Add included items as $0 lines so the Ingredients tab totals remain accurate
           addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Hayward)', unitPrice:0, qty:10*(qty||1), type:'extra', meta:'Hayward Special' });
           addToCart({ id:'bev-iced', name:'🧊 Iced Latte (Hayward)', unitPrice:0, qty:10*(qty||1), type:'drink', meta:'Hayward Special' });
-          Object.entries(cakeCounts).forEach(([id,c])=>{
-            if(c>0){
-              const nm=(getCakePool().find(x=>x.id===id)||{}).name||'Cake';
-              addToCart({ id:`hay-${id}`, name:`${nm} (Hayward)`, unitPrice:0, qty:c, type:'extra', meta:'Hayward Special' });
-            }
-          });
+          Object.entries(cakeCounts).forEach(([id,c])=>{ if(c>0){
+            const nm=(getCakePool().find(x=>x.id===id)||{}).name||'Cake';
+            addToCart({ id:id, name:`${nm} (Hayward)`, unitPrice:0, qty:c, type:'extra', meta:'Hayward Special' });
+          }});
           comboModal.close();
         };
 
@@ -752,7 +807,7 @@
         const meta=drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
         addToCart({
           id:item.id,
-          name:item.name + (upcharge>0?` (+$${upcharge} iced upcharge)`:''),
+          name:item.name + (upcharge>0?` (+$${upcharge} iced upcharge)`:'' ),
           unitPrice:(item.price + upcharge),
           qty:qty||1,
           type:item.type,
@@ -768,12 +823,29 @@
       comboModal.showModal();
     }
 
-    // ---------- Ingredients ----------
+    // ---------- Ingredients (tab & copy/export) ----------
     function aggregateIngredients(){
-      const tally={}; const add=(n,x=1)=>{ if(!n) return; tally[n]=(tally[n]||0)+x; };
+      const tally={};
+      const add=(n,x=1)=>{ if(!n) return; tally[n]=(tally[n]||0)+x; };
+
       state.cart.forEach(line=>{
-        if((line.type==='drink'||line.type==='extra') && line.id && RECIPE_MAP[line.id]){
-          Object.entries(RECIPE_MAP[line.id]).forEach(([ing,c])=> add(ing, c*line.qty));
+        // Direct recipe
+        if(RECIPE_MAP[line.id]){
+          for(const [ing,c] of Object.entries(RECIPE_MAP[line.id])) add(ing, c*line.qty);
+        }
+        // Bundle drinks chosen
+        if(line.drinks){
+          for(const [drinkId,c] of Object.entries(line.drinks)){
+            const rec = RECIPE_MAP[drinkId];
+            if(rec) for(const [ing,n] of Object.entries(rec)) add(ing, n*c*(line.qty||1));
+          }
+        }
+        // Hayward cakes on bundle line (iced lattes + waffles are added as $0 separate lines)
+        if(line.id==='sp-hay' && line.cakes){
+          for(const [cakeId,c] of Object.entries(line.cakes)){
+            const rec = RECIPE_MAP[cakeId];
+            if(rec) for(const [ing,n] of Object.entries(rec)) add(ing, n*c*(line.qty||1));
+          }
         }
       });
       return tally;
@@ -790,7 +862,7 @@
     });
     document.getElementById('exportIngBtn')?.addEventListener('click',()=>{
       const rows=[['Ingredient','Count'],...Object.entries(aggregateIngredients()).sort((a,b)=>a[0].localeCompare(b[0]))];
-      const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+      const csv=rows.map(r=> r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
       const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
       const a=document.createElement('a'); a.href=url; a.download='beanmachine_ingredients.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     });
@@ -826,7 +898,7 @@
     applyTheme(localStorage.getItem('beanmachine_theme')||'light');
     themeBtn.addEventListener('click',()=>{ const next=(localStorage.getItem('beanmachine_theme')||'light')==='light'?'dark':'light'; applyTheme(next); });
 
-    // ---------- Loyalty (local, Bean Machine only) ----------
+    // ---------- Loyalty (local) ----------
     const REQUIRED_PUNCHES=10;
     const loy={
       els:{
@@ -903,15 +975,11 @@
       const item={ id:'loy-reward-bm', name:'🎁 Loyalty Reward: Large Meal + 2 Cheesecakes', price:0, type:'bundle', drinksIncluded:10 };
       openComboWizard(item,1);
     }
-
     loy.els.redeem.addEventListener('click',()=>{
       const id=(loy.els.id.value||'').trim(); if(!id) return loySetStatus('Enter a customer name.',false);
       const p=loy.players[id]; if(!p || (p.rewards||0)<=0) return loySetStatus('No rewards banked for this customer.',false);
-      // consume one reward, open wizard
       p.rewards--; p.last=Date.now(); loy.players[id]=p; savePlayers();
       loy.currentId=id; loySetStatus('Reward redeemed! Pick your 10 drinks.', true);
-      // Wizard for 10 drinks; when it finishes, lines are added with price/upcharge logic.
-      // We intercept in addToCart by checking id === 'loy-reward-bm' to make included sides.
       openRewardWizardBM();
     });
 
@@ -920,7 +988,6 @@
     addToCart = function(line){
       _oldAddToCart(line);
       if(line && line.id==='loy-reward-bm'){
-        // Add 10 waffles + 2 cheesecakes at $0
         _oldAddToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Loyalty Reward)', unitPrice:0, qty:10*(line.qty||1), type:'extra', meta:'Loyalty Reward' });
         _oldAddToCart({ id:'ex-cheese', name:'🍰 Cheesecake (Loyalty Reward)', unitPrice:0, qty:2*(line.qty||1), type:'extra', meta:'Loyalty Reward' });
       }
@@ -937,7 +1004,7 @@
         const fr=new FileReader(); fr.onload=()=>{ try{
           const data=JSON.parse(fr.result); if(data.players) loy.players=data.players;
           if(typeof data.visitId==='number') loy.visitId=data.visitId;
-          savePlayers(); saveVisit(); loyaltyRenderAll(); loySetStatus('Import complete.', true);
+          localStorage.setItem('bm_loyalty_v1', JSON.stringify(loy.players)); saveVisit(); loyaltyRenderAll(); loySetStatus('Import complete.', true);
         }catch{ loySetStatus('Import failed (bad JSON).', false);} };
         fr.readAsText(file);
       };
@@ -945,8 +1012,7 @@
     });
 
     // ---------- Init ----------
-    function renderAllInit(){ renderAll(); }
-    renderAllInit(); loyaltyRenderAll();
+    renderAll(); loyaltyRenderAll();
   </script>
 </body>
 </html>
