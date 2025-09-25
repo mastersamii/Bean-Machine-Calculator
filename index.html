@@ -301,25 +301,26 @@
     // ---------- Data ----------
     const MENU = {
       classic: [
-        { id:'bev-bean', name:'☕ Bean Coffee',   price:30,  type:'drink' },
-        { id:'bev-esp',  name:'⚡ Espresso',      price:40,  type:'drink' },
-        { id:'bev-iced', name:'🧊 Iced Latte',    price:40,  type:'drink' },
-        { id:'bev-choc', name:'🍫 Hot Chocolate', price:100, type:'drink' },
+        { id:'bev-bean', name:'☕ Bean Coffee',   price:40,  type:'drink' },
+        { id:'bev-capp', name:'☕ Cappuccino',    price:30,  type:'drink' },
+        { id:'bev-esp',  name:'⚡ Espresso',      price:60,  type:'drink' },
+        { id:'bev-iced', name:'🧊 Iced Latte',    price:30,  type:'drink' },
+        { id:'bev-choc', name:'🍫 Hot Chocolate', price:85, type:'drink' },
       ],
       bundles: [
-        { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:250, type:'bundle', drinksIncluded:5,
-          description:'Pick any 5 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 5 Wonder Waffles.' },
-        { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:450, type:'bundle', drinksIncluded:10,
-          description:'Pick any 10 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 10 Wonder Waffles.' },
+        { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:375, type:'bundle', drinksIncluded:5,
+          description:'Pick any 5 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 5 Wonder Waffles.' },
+        { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:750, type:'bundle', drinksIncluded:10,
+          description:'Pick any 10 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 10 Wonder Waffles.' },
 
         // Bean Box & Refill
         { id:'pk-beanbox',
           name:'🍱 Bean Box: Large Meal + Lunch Box',
-          price:900, type:'bundle', drinksIncluded:10,
+          price:980, type:'bundle', drinksIncluded:10,
           description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick Pink Lemonade, Bean Coffee, or Espresso. Iced Latte allowed with +$10 each.' },
         { id:'rf-beanbox',
           name:'🍱 Bean Box Refill: 10 Drinks + 10 Waffles',
-          price:350, type:'bundle', drinksIncluded:10,
+          price:540, type:'bundle', drinksIncluded:10,
           description:'10 drinks + 10 waffles. Iced Latte +$10 each.' },
 
         { id:'sp-hay',   name:'Hayward Special', price:1240, type:'bundle',
@@ -328,20 +329,20 @@
           description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.' },
       ],
       extras: [
-        { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:35,  type:'extra', isDrink:true },
+        { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:50,  type:'extra', isDrink:true },
 
-        { id:'ex-cup',    name:'🧁 Cupcake',        price:25,  type:'extra' },
-        { id:'ex-cookie', name:'🍪 Cream Cookie',   price:25,  type:'extra' },
-        { id:'ex-donut',  name:'🍩 Donut',          price:20,  type:'extra' },
-        { id:'ex-waffle', name:'🧇 Wonder Waffle',  price:20,  type:'extra' },
+        { id:'ex-cup',    name:'🧁 Cupcake',        price:30,  type:'extra' },
+        { id:'ex-cookie', name:'🍪 Cream Cookie',   price:40,  type:'extra' },
+        { id:'ex-donut',  name:'🍩 Donut',          price:25,  type:'extra' },
+        { id:'ex-waffle', name:'🧇 Wonder Waffle',  price:25,  type:'extra' },
 
-        { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:150, type:'extra', isCake:true },
-        { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:150, type:'extra', isCake:true },
-        { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:150, type:'extra', isCake:true },
+        { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:100, type:'extra', isCake:true },
+        { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:110, type:'extra', isCake:true },
+        { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:120, type:'extra', isCake:true },
 
         { id:'ex-cheese', name:'🍰 Cheesecake',     price:30,  type:'extra' },
         { id:'ex-kinder', name:'🥚 Kinder Egg',     price:1500, type:'extra' },
-        { id:'ex-lunch',  name:'🍱 Lunch Box',      price:450,  type:'extra' },
+        { id:'ex-lunch',  name:'🍱 Lunch Box',      price:440,  type:'extra' },
       ],
       specialty:[], deals:[], packs:[],
     };
