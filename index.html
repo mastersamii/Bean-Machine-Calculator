@@ -109,8 +109,18 @@
           </div>
 
           <div class="section">
-            <h3 style="margin:0 0 8px 0">Specials & Bundles</h3>
-            <div class="cards" id="bundles"></div>
+            <h3 style="margin:0 0 8px 0">Meal Bundles</h3>
+            <div class="cards" id="mealBundles"></div>
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Specials</h3>
+            <div class="cards" id="specials"></div>
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Bean Box</h3>
+            <div class="cards" id="beanBox"></div>
           </div>
 
           <div class="section">
@@ -302,7 +312,7 @@
         { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:450, type:'bundle', drinksIncluded:10,
           description:'Pick any 10 drinks (🩷🍋 Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$15 each. Includes 10 Wonder Waffles.' },
 
-        //  Bean Box & Refill (Large-equivalents)
+        // Bean Box & Refill
         { id:'pk-beanbox',
           name:'📦 Bean Box (Large Meal + Lunch Box)',
           price:900, type:'bundle', drinksIncluded:10,
@@ -318,14 +328,13 @@
           description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.' },
       ],
       extras: [
-        { id:'ex-lemon',  name:'🩷🍋 Pink Lemonade', price:35,  type:'extra', isDrink:true },
+        { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:35,  type:'extra', isDrink:true },
 
         { id:'ex-cup',    name:'🧁 Cupcake',        price:25,  type:'extra' },
         { id:'ex-cookie', name:'🍪 Cream Cookie',   price:25,  type:'extra' },
         { id:'ex-donut',  name:'🍩 Donut',          price:20,  type:'extra' },
         { id:'ex-waffle', name:'🧇 Wonder Waffle',  price:20,  type:'extra' },
 
-        // Cakes
         { id:'ex-cake-berry', name:'🍓 Berry Cake',      price:30, type:'extra', isCake:true },
         { id:'ex-cake-lemon', name:'🍋 Lemon Cake',      price:30, type:'extra', isCake:true },
         { id:'ex-cake-choc',  name:'🍫 Chocolate Cake',  price:30, type:'extra', isCake:true },
@@ -337,14 +346,12 @@
       specialty:[], deals:[], packs:[],
     };
 
-    // Recipes (per one item)
+    // Recipes
     const RECIPE_MAP = {
-      // Drinks
       'bev-bean': {'Water':2,'Coffee bag':1},
       'bev-iced': {'Coffee bag':1,'Sugar':1,'Milk':1,'Water':1},
       'bev-esp' : {'Coffee bag':2,'Water':2},
       'bev-choc': {'Milk':2,'Sugar':2,'Cocoa Powder':4},
-      // Cakes
       'ex-cake-berry': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cherry':1,'Strawberry':1},
       'ex-cake-lemon': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Lemon':2},
       'ex-cake-choc' : {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cocoa Powder':2},
@@ -407,12 +414,16 @@
 
     function renderCards(){
       const classic = document.getElementById('classic');
-      const bundles = document.getElementById('bundles');
+      const mealBundles = document.getElementById('mealBundles');
+      const specials = document.getElementById('specials');
+      const beanBox = document.getElementById('beanBox');
       const extras  = document.getElementById('extras');
 
       const make = arr => arr.map(cardHTML).join('');
       classic.innerHTML = make(MENU.classic);
-      bundles.innerHTML = make(MENU.bundles);
+      mealBundles.innerHTML = make(MENU.bundles.filter(i=>['bd-med','bd-large','sp-kids'].includes(i.id)));
+      specials.innerHTML = make(MENU.bundles.filter(i=>i.id==='sp-hay'));
+      beanBox.innerHTML = make(MENU.bundles.filter(i=>['pk-beanbox','rf-beanbox'].includes(i.id)));
       extras.innerHTML  = make(MENU.extras);
 
       const allItems = [...MENU.classic,...MENU.bundles,...MENU.extras];
@@ -445,7 +456,7 @@
       });
     }
 
-    // ---------- Cart ----------
+    // ---------- Cart (no ingredient lines here) ----------
     function renderCart(){
       const cart = document.getElementById('cart');
       if(!state.cart.length){
@@ -502,7 +513,7 @@
       const day = new Date().getDay(); // 0 Sun .. 6 Sat
       let notes=[]; let discount=0;
 
-      // Mon–Wed: Buy one Medium, second gets MW_SECOND_OFF
+      // Mon–Wed: Medium second gets % off
       if(day>=1 && day<=3){
         const med = state.cart.find(l=>l.id==='bd-med');
         if(med && med.qty>=2){
@@ -512,7 +523,7 @@
         }
       }
 
-      // Thu–Sat: freebies per Large-equivalent (Large, Bean Box, Bean Box Refill)
+      // Thu–Sat: freebies per Large-equivalent (Large, Bean Box, Refill)
       if(day>=4 && day<=6){
         const largeEqQty = state.cart.reduce((s,l)=>
           s + (['bd-large','pk-beanbox','rf-beanbox'].includes(l.id) ? l.qty : 0), 0);
@@ -532,7 +543,6 @@
         }
       }
 
-      // Sunday: open (no auto promo)
       return { discount:+discount.toFixed(2), notes };
     }
 
@@ -628,7 +638,7 @@
     document.getElementById('closeCombo').addEventListener('click',()=>comboModal.close());
 
     function openComboWizard(item, qty){
-      // Hayward: choose 2 cakes from the 3 cake types
+      // Hayward: choose 2 cakes
       if(item.id==='sp-hay'){
         const cakesNeeded = 2*(qty||1);
         const cakePool = getCakePool();
@@ -690,7 +700,6 @@
         comboNext.onclick=()=>{
           if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
           addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:qty||1, type:item.type, cakes:cakeCounts, meta:'Includes 10 Iced Lattes + 10 Waffles' });
-          // Add included items as $0 lines so the Ingredients tab totals remain accurate
           addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Hayward)', unitPrice:0, qty:10*(qty||1), type:'extra', meta:'Hayward Special' });
           addToCart({ id:'bev-iced', name:'🧊 Iced Latte (Hayward)', unitPrice:0, qty:10*(qty||1), type:'drink', meta:'Hayward Special' });
           Object.entries(cakeCounts).forEach(([id,c])=>{ if(c>0){
@@ -732,7 +741,8 @@
           btn.addEventListener('click',()=>{
             const id=btn.getAttribute('data-plus');
             const usedNow=Object.values(counts).reduce((a,b)=>a+b,0);
-            if(usedNow<drinksNeeded){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value=counts[id]; renderGrid(); }
+            if(usedNow<drinksNeeded){ counts[id]=(counts[id]||0)+1; comboContent.querySelector(`[data-out="${id}"]`).value=c
+ounts[id]; renderGrid(); }
           });
         });
         comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
@@ -781,7 +791,6 @@
           meta
         });
 
-        // Add included waffles (and lunch box for Bean Box) as $0 lines
         const waffles =
           item.id==='bd-med' ? 5 :
           (['bd-large','pk-beanbox','rf-beanbox'].includes(item.id) ? 10 : 0);
@@ -797,24 +806,21 @@
       comboModal.showModal();
     }
 
-    // ---------- Ingredients (tab & copy/export) ----------
+    // ---------- Ingredients (tab only) ----------
     function aggregateIngredients(){
       const tally={};
       const add=(n,x=1)=>{ if(!n) return; tally[n]=(tally[n]||0)+x; };
 
       state.cart.forEach(line=>{
-        // Direct recipe
         if(RECIPE_MAP[line.id]){
           for(const [ing,c] of Object.entries(RECIPE_MAP[line.id])) add(ing, c*line.qty);
         }
-        // Bundle drinks chosen
         if(line.drinks){
           for(const [drinkId,c] of Object.entries(line.drinks)){
             const rec = RECIPE_MAP[drinkId];
             if(rec) for(const [ing,n] of Object.entries(rec)) add(ing, n*c*(line.qty||1));
           }
         }
-        // Hayward cakes on bundle line (iced lattes & waffles tracked via $0 lines)
         if(line.id==='sp-hay' && line.cakes){
           for(const [cakeId,c] of Object.entries(line.cakes)){
             const rec = RECIPE_MAP[cakeId];
@@ -945,7 +951,6 @@
     });
 
     function openRewardWizardBM(){
-      // Reward: Large Meal equivalent (10 drinks + 10 waffles) + 2 cheesecakes, all free
       const item={ id:'loy-reward-bm', name:'🎁 Loyalty Reward: Large Meal + 2 Cheesecakes', price:0, type:'bundle', drinksIncluded:10 };
       openComboWizard(item,1);
     }
@@ -957,7 +962,6 @@
       openRewardWizardBM();
     });
 
-    // Hook
     const _oldAddToCart = addToCart;
     addToCart = function(line){
       _oldAddToCart(line);
