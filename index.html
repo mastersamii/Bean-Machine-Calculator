@@ -295,8 +295,8 @@
 
   <script>
     // ---------- Config ----------
-    const MW_SECOND_OFF = 0.20;           // Mon–Wed: percent off second Medium
-    const WEEKEND_FREEBIES_PER_LARGE = 5; // Thu–Sat freebies per Large
+    const MW_SECOND_OFF = 0.20;           // Mon–Wed: 20 percent off second Medium
+    const WEEKEND_FREEBIES_PER_LARGE = 5; // Thu–Sat freebies per Large meal
 
     // ---------- Data ----------
     const MENU = {
@@ -309,19 +309,19 @@
       ],
       bundles: [
         { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:375, type:'bundle', drinksIncluded:5,
-          description:'Pick any 5 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 5 Wonder Waffles.' },
+          description:'Pick any 5 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 5 Wonder Waffles.' },
         { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:750, type:'bundle', drinksIncluded:10,
-          description:'Pick any 10 drinks (Pink Lemonade, Bean Coffee, Espresso). Iced Latte allowed with +$10 each. Includes 10 Wonder Waffles.' },
+          description:'Pick any 10 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 10 Wonder Waffles.' },
 
         // Bean Box & Refill
         { id:'pk-beanbox',
           name:'🍱 Bean Box: Large Meal + Lunch Box',
           price:980, type:'bundle', drinksIncluded:10,
-          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick Pink Lemonade, Bean Coffee, or Espresso. Iced Latte allowed with +$10 each.' },
+          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte. Espresso +$20 each · Hot Chocolate +$24 each.' },
         { id:'rf-beanbox',
           name:'🍱 Bean Box Refill: 10 Drinks + 10 Waffles',
           price:540, type:'bundle', drinksIncluded:10,
-          description:'10 drinks + 10 waffles. Iced Latte +$10 each.' },
+          description:'10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte. Espresso +$20 each · Hot Chocolate +$24 each.' },
 
         { id:'sp-hay',   name:'Hayward Special', price:1250, type:'bundle',
           description:'10 Wonder Waffles + 10 Iced Lattes + 2 Cakes of your choice.' },
@@ -389,10 +389,11 @@
     }
     function getMealDrinkPool(){
       return [
-        ...MENU.classic.filter(x=>x.id==='bev-bean'||x.id==='bev-esp'||x.id==='bev-iced'),
+        ...MENU.classic.filter(x=>['bev-bean','bev-esp','bev-iced','bev-choc'].includes(x.id)),
         ...MENU.extras.filter(x=>x.id==='ex-lemon')
       ];
     }
+
     function getCakePool(){ return MENU.extras.filter(x=>x.id.startsWith('ex-cake-')); }
 
     // ---------- Cards ----------
@@ -457,7 +458,7 @@
       });
     }
 
-    // ---------- Cart (no ingredient lines here) ----------
+    // ---------- Cart ----------
     function renderCart(){
       const cart = document.getElementById('cart');
       if(!state.cart.length){
@@ -514,7 +515,7 @@
       const day = new Date().getDay(); // 0 Sun .. 6 Sat
       let notes=[]; let discount=0;
 
-      // Mon–Wed: Medium second gets % off
+      // Mon–Wed: Medium second gets 20% off
       if(day>=1 && day<=3){
         const med = state.cart.find(l=>l.id==='bd-med');
         if(med && med.qty>=2){
@@ -776,14 +777,15 @@
       comboPrev.onclick=()=>{};
       comboNext.onclick=()=>{
         if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
-        const icedCount=(counts['bev-iced']||0);
-        const upcharge=10*icedCount;
+        const espCount  = (counts['bev-esp']  || 0);
+        const chocCount = (counts['bev-choc'] || 0);
+        const upcharge = (20 * espCount) + (24 * chocCount);
         const fmt=id=>(findMenuItem(id)||{}).name||id;
         const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
         const meta=drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
         addToCart({
           id:item.id,
-          name:item.name + (upcharge>0?` (+$${upcharge} iced upcharge)`:'' ),
+          name:item.name + (upcharge>0?` (+$${upcharge} premium drinks)`:'' ),
           unitPrice:(item.price + upcharge),
           qty:qty||1,
           type:item.type,
