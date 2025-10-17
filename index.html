@@ -66,10 +66,6 @@
     .select-qty button{height:32px;border-radius:8px;border:1px solid var(--border);background:var(--chip)}
     .ing-list{display:grid;grid-template-columns:1fr auto;gap:8px}
     .ing-actions{display:flex;gap:8px;justify-content:flex-end}
-    .punchtray{display:flex;gap:8px;flex-wrap:wrap}
-    .chipbox{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--chip);border:1px dashed #cab8a0}
-    .chipbox.filled{background:repeating-conic-gradient(from 0deg,var(--brown) 0 20%,#593d2e 0 40%);border:none;color:#fff}
-    .chipbox.free{border:1px solid var(--brown)}
   </style>
 </head>
 <body>
@@ -124,7 +120,12 @@
           </div>
 
           <div class="section">
-            <h3 style="margin:0 0 8px 0">Bakes, Ice Cream & Drinks</h3>
+            <h3 style="margin:0 0 8px 0">Ice Cream</h3>
+            <div class="cards" id="iceCream"></div>
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0">Bakes & Drinks</h3>
             <div class="cards" id="extras"></div>
           </div>
         </div>
@@ -138,7 +139,6 @@
             <button class="btn" data-tab="summary" aria-selected="true">🧾 Summary</button>
             <button class="btn" data-tab="history" aria-selected="false">📜 History</button>
             <button class="btn" data-tab="ingredients" aria-selected="false">🧺 Ingredients</button>
-            <button class="btn" data-tab="loyalty" aria-selected="false">⭐ Loyalty</button>
           </div>
 
           <!-- SUMMARY TAB -->
@@ -188,10 +188,6 @@
 
           <!-- HISTORY TAB -->
           <div id="tab-history" role="tabpanel" hidden>
-            <div class="summary" style="gap:8px; margin-bottom:8px;">
-              <div class="row"><span>Orders served today</span><strong id="ordersToday">0</strong></div>
-              <div class="row"><span>Orders served overall</span><strong id="ordersOverall">0</strong></div>
-            </div>
             <div id="historyList" class="summary" style="gap:12px;"></div>
             <div class="right-actions" style="margin-top:12px;">
               <button class="btn ghost" id="clearHistoryBtn">Clear History</button>
@@ -209,69 +205,6 @@
               <button class="btn" id="exportIngBtn">Export CSV</button>
             </div>
           </div>
-
-          <!-- LOYALTY TAB -->
-          <div id="tab-loyalty" role="tabpanel" hidden>
-            <div class="option" style="margin-bottom:10px;">
-              <div>
-                <div><strong>Loyalty Manager Bean Machine</strong></div>
-                <div class="small">10 punches → Reward: Large Meal (10 drinks + 10 waffles) + 2 Cheesecakes.</div>
-                <div class="small" id="dpStatus">Double Punch Tuesday: auto on Tuesdays</div>
-              </div>
-              <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;align-items:end;max-width:860px">
-                <div>
-                  <label class="small muted">Customer Name</label>
-                  <input id="loy-player" placeholder="John Doe" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;color:#000" />
-                </div>
-                <button class="btn primary" id="loy-add">Add Punch</button>
-                <div style="text-align:right">
-                  <div class="small muted">Visit</div>
-                  <div class="toolrow" style="justify-content:flex-end">
-                    <span class="chip" id="visitInfo">#1 • 0 punched</span>
-                    <button class="btn" id="newVisitBtn" title="Start a new visit (resets per-visit limits)">New Visit</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="order-card" style="padding:12px;margin-bottom:10px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-                <div>
-                  <div class="small muted">Punch Card</div>
-                  <div id="loy-tray" class="punchtray" aria-live="polite"></div>
-                </div>
-                <div class="toolrow">
-                  <button class="btn" id="loy-undo">-1 Punch</button>
-                  <button class="btn" id="loy-redeem">Redeem Reward → Pick Drinks</button>
-                </div>
-              </div>
-              <div id="loy-status" class="small muted" style="margin-top:6px;">—</div>
-            </div>
-
-            <div class="order-card" style="padding:0;">
-              <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                <strong>Customers</strong>
-                <div class="small muted" id="loy-stats">Players: 0 • Rewards banked: 0</div>
-              </div>
-              <div style="padding:12px;">
-                <table style="width:100%;border-collapse:collapse">
-                  <thead>
-                    <tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Name</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Punches</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Rewards</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Last</th>
-                        <th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)"></th></tr>
-                  </thead>
-                  <tbody id="loy-body"></tbody>
-                </table>
-              </div>
-              <div style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-                <button class="btn" id="loy-export">Export JSON</button>
-                <button class="btn ghost" id="loy-import">Import JSON</button>
-              </div>
-            </div>
-          </div>
-          <!-- /LOYALTY TAB -->
         </div>
       </aside>
     </div>
@@ -305,7 +238,7 @@
         { id:'bev-capp', name:'☕ Cappuccino',    price:30,  type:'drink' },
         { id:'bev-esp',  name:'⚡ Espresso',      price:60,  type:'drink' },
         { id:'bev-iced', name:'🧊 Iced Latte',    price:30,  type:'drink' },
-        { id:'bev-choc', name:'🍫 Hot Chocolate', price:85, type:'drink' },
+        { id:'bev-choc', name:'🍫 Hot Chocolate', price:85,  type:'drink' },
       ],
       bundles: [
         { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:375, type:'bundle', drinksIncluded:5,
@@ -313,7 +246,6 @@
         { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:750, type:'bundle', drinksIncluded:10,
           description:'Pick any 10 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 10 Wonder Waffles.' },
 
-        // Bean Box & Refill
         { id:'pk-beanbox',
           name:'🍱 Bean Box: Large Meal + Lunch Box',
           price:980, type:'bundle', drinksIncluded:10,
@@ -328,19 +260,21 @@
         { id:'sp-kids',  name:'Kids Meal', price:2200, type:'bundle',
           description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.' },
       ],
+
+      // ---------- Ice Cream (60% profit -> price = cost/0.4) ----------
+      iceCream: [
+        { id:'ex-ice-van',   name:'🍦 Vanilla Ice Cream',      price:40, type:'extra' },  // 6 + 10 = 16 -> 40
+        { id:'ex-ice-choc',  name:'🍦 Chocolate Ice Cream',    price:60, type:'extra' },  // + Cocoa 8 -> 24 -> 60
+        { id:'ex-ice-apple', name:'🍦 Apple Ice Cream',        price:60, type:'extra' },  // + Apple 8 -> 24 -> 60
+        { id:'ex-ice-banana',name:'🍦 Banana Ice Cream',       price:60, type:'extra' },  // + Banana 8 -> 24 -> 60
+        { id:'ex-ice-mango', name:'🍦 Mango Ice Cream',        price:70, type:'extra' },  // + Mango 12 -> 28 -> 70
+        { id:'ex-ice-pom',   name:'🍦 Pomegranate Ice Cream',  price:75, type:'extra' },  // + Pomegranate 14 -> 30 -> 75
+        { id:'ex-ice-water', name:'🍦 Watermelon Ice Cream',   price:90, type:'extra' },  // + Watermelon 20 -> 36 -> 90
+        { id:'ex-ice-lemon', name:'🍦 Lemon Ice Cream',        price:55, type:'extra' },  // + Lemon 6 -> 22 -> 55
+      ],
+
       extras: [
         { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:50,  type:'extra', isDrink:true },
-
-        /* ---------- NEW: Ice Creams ---------- */
-        { id:'ex-ice-van',  name:'🍦 Vanilla Ice Cream',       price:20, type:'extra' },
-        { id:'ex-ice-choc', name:'🍦 Chocolate Ice Cream',     price:20, type:'extra' },
-        { id:'ex-ice-apple',name:'🍦 Apple Ice Cream',         price:20, type:'extra' },
-        { id:'ex-ice-banana',name:'🍦 Banana Ice Cream',       price:20, type:'extra' },
-        { id:'ex-ice-mango', name:'🍦 Mango Ice Cream',        price:20, type:'extra' },
-        { id:'ex-ice-pom',   name:'🍦 Pomegranate Ice Cream',  price:20, type:'extra' },
-        { id:'ex-ice-water', name:'🍦 Watermelon Ice Cream',   price:20, type:'extra' },
-        { id:'ex-ice-lemon', name:'🍦 Lemon Ice Cream',        price:20, type:'extra' },
-        /* ------------------------------------ */
 
         { id:'ex-cup',    name:'🧁 Cupcake',        price:30,  type:'extra' },
         { id:'ex-cookie', name:'🍪 Cream Cookie',   price:40,  type:'extra' },
@@ -358,18 +292,14 @@
       specialty:[], deals:[], packs:[],
     };
 
-    // Recipes
+    // ---------- Recipes ----------
     const RECIPE_MAP = {
       'bev-bean': {'Water':2,'Coffee bag':1},
       'bev-iced': {'Coffee bag':1,'Sugar':1,'Milk':1,'Water':1},
       'bev-esp' : {'Coffee bag':2,'Water':2},
       'bev-choc': {'Milk':2,'Sugar':2,'Cocoa Powder':4},
 
-      /* ---------- NEW: Ice Cream recipes ----------
-         Base: Ice Cream Cone + Milk
-         Chocolate: + Cocoa Powder
-         Fruit flavors: + the fruit
-      ------------------------------------------------ */
+      // Ice Cream bases: Cone + Milk; add flavor ingredient
       'ex-ice-van'  : {'Ice Cream Cone':1,'Milk':1},
       'ex-ice-choc' : {'Ice Cream Cone':1,'Milk':1,'Cocoa Powder':1},
       'ex-ice-apple': {'Ice Cream Cone':1,'Milk':1,'Apple':1},
@@ -378,7 +308,6 @@
       'ex-ice-pom'  : {'Ice Cream Cone':1,'Milk':1,'Pomegranate':1},
       'ex-ice-water': {'Ice Cream Cone':1,'Milk':1,'Watermelon':1},
       'ex-ice-lemon': {'Ice Cream Cone':1,'Milk':1,'Lemon':1},
-      /* ------------------------------------------- */
 
       'ex-cake-berry': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cherry':1,'Strawberry':1},
       'ex-cake-lemon': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Lemon':2},
@@ -388,8 +317,8 @@
     const currency = n => `$${n.toFixed(2)}`;
 
     // ---------- State ----------
-    const STATE_KEY = 'beanmachine_state_v6';
-    const HIST_KEY  = 'beanmachine_history_v6';
+    const STATE_KEY = 'beanmachine_state_v7';
+    const HIST_KEY  = 'beanmachine_history_v7';
 
     const state = { cart:[], discountPct:0, history:[], fulfillment:'pickup', deliveryZone:'city' };
 
@@ -410,7 +339,7 @@
 
     // ---------- Helpers ----------
     function findMenuItem(id){
-      const pools = [MENU.classic,MENU.specialty,MENU.deals,MENU.packs,MENU.bundles,MENU.extras];
+      const pools = [MENU.classic,MENU.specialty,MENU.deals,MENU.packs,MENU.bundles,MENU.extras,MENU.iceCream];
       for(const pool of pools){ const f = pool.find(x=>x.id===id); if(f) return f; }
       return null;
     }
@@ -420,7 +349,6 @@
         ...MENU.extras.filter(x=>x.id==='ex-lemon')
       ];
     }
-
     function getCakePool(){ return MENU.extras.filter(x=>x.id.startsWith('ex-cake-')); }
 
     // ---------- Cards ----------
@@ -446,6 +374,7 @@
       const mealBundles = document.getElementById('mealBundles');
       const specials = document.getElementById('specials');
       const beanBox = document.getElementById('beanBox');
+      const iceCream = document.getElementById('iceCream');
       const extras  = document.getElementById('extras');
 
       const make = arr => arr.map(cardHTML).join('');
@@ -453,9 +382,10 @@
       mealBundles.innerHTML = make(MENU.bundles.filter(i=>['bd-med','bd-large','sp-kids'].includes(i.id)));
       specials.innerHTML = make(MENU.bundles.filter(i=>i.id==='sp-hay'));
       beanBox.innerHTML = make(MENU.bundles.filter(i=>['pk-beanbox','rf-beanbox'].includes(i.id)));
+      iceCream.innerHTML = make(MENU.iceCream);
       extras.innerHTML  = make(MENU.extras);
 
-      const allItems = [...MENU.classic,...MENU.bundles,...MENU.extras];
+      const allItems = [...MENU.classic,...MENU.bundles,...MENU.extras,...MENU.iceCream];
 
       document.querySelectorAll('.cards .card').forEach(card=>{
         let count=1;
@@ -599,15 +529,7 @@
     range.addEventListener('input',()=>{ state.discountPct=+range.value; persist(); renderTotals(); discountLabel.textContent = `${state.discountPct}%`; });
 
     // ---------- History ----------
-    function ordersServedCounters(){
-      const todayStr=new Date().toDateString();
-      const today=state.history.filter(h=> new Date(h.id).toDateString()===todayStr).length;
-      const overall=state.history.length;
-      document.getElementById('ordersToday').textContent=today;
-      document.getElementById('ordersOverall').textContent=overall;
-    }
     function renderHistory(){
-      ordersServedCounters();
       const list=document.getElementById('historyList');
       if(!state.history.length){ list.innerHTML='<div class="muted">No past orders yet. Checkout to save one.</div>'; return; }
       list.innerHTML = state.history.map(h=>`
@@ -641,7 +563,7 @@
         state.history = state.history.filter(x=>x.id!==id); persistHistory(); renderHistory();
       }));
     }
-    document.getElementById('clearHistoryBtn').addEventListener('click',()=>{ if(confirm('Clear all saved orders?')){ state.history=[]; persistHistory(); renderHistory(); ordersServedCounters(); } });
+    document.getElementById('clearHistoryBtn').addEventListener('click',()=>{ if(confirm('Clear all saved orders?')){ state.history=[]; persistHistory(); renderHistory(); } });
 
     // ---------- Tabs ----------
     const tabButtons=document.querySelectorAll('[data-tab]');
@@ -649,11 +571,9 @@
       document.getElementById('tab-summary').hidden = which!=='summary';
       document.getElementById('tab-history').hidden = which!=='history';
       document.getElementById('tab-ingredients').hidden = which!=='ingredients';
-      document.getElementById('tab-loyalty').hidden = which!=='loyalty';
       tabButtons.forEach(b=>b.setAttribute('aria-selected', String(b.getAttribute('data-tab')===which)));
       if(which==='ingredients') renderIngredients();
-      if(which==='history') ordersServedCounters();
-      if(which==='loyalty') loyaltyRenderAll();
+      if(which==='history') renderHistory();
     }
     tabButtons.forEach(b=>b.addEventListener('click',()=>selectTab(b.getAttribute('data-tab'))));
 
@@ -667,10 +587,9 @@
     document.getElementById('closeCombo').addEventListener('click',()=>comboModal.close());
 
 function openComboWizard(item, qty){
-  // Helper
   const usedTotal = (counts) => Object.values(counts).reduce((a,b)=>a+b,0);
 
-  // ---------- HAYWARD SPECIAL: choose 2 cakes per bundle ----------
+  // ---------- HAYWARD SPECIAL: choose 2 cakes ----------
   if(item.id==='sp-hay'){
     const cakesNeeded = 2*(qty||1);
     const cakePool = getCakePool();
@@ -699,7 +618,6 @@ function openComboWizard(item, qty){
             </div>`).join('')}
         </div>`;
 
-      // + / −
       comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
         btn.addEventListener('click',()=>{
           const id = btn.getAttribute('data-plus');
@@ -717,7 +635,6 @@ function openComboWizard(item, qty){
         });
       });
 
-      // Half / Max
       comboContent.querySelectorAll('[data-half]').forEach(btn=>{
         btn.addEventListener('click',()=>{
           const id = btn.getAttribute('data-half');
@@ -806,7 +723,6 @@ function openComboWizard(item, qty){
           </div>`).join('')}
       </div>`;
 
-    // + / −
     comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const id = btn.getAttribute('data-plus');
@@ -824,7 +740,6 @@ function openComboWizard(item, qty){
       });
     });
 
-    // Half / Max
     comboContent.querySelectorAll('[data-half]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const id = btn.getAttribute('data-half');
@@ -974,121 +889,8 @@ function openComboWizard(item, qty){
     applyTheme(localStorage.getItem('beanmachine_theme')||'light');
     themeBtn.addEventListener('click',()=>{ const next=(localStorage.getItem('beanmachine_theme')||'light')==='light'?'dark':'light'; applyTheme(next); });
 
-    // ---------- Loyalty (local) ----------
-    const REQUIRED_PUNCHES=10;
-    const loy={
-      els:{
-        id:document.getElementById('loy-player'), add:document.getElementById('loy-add'), undo:document.getElementById('loy-undo'),
-        redeem:document.getElementById('loy-redeem'), tray:document.getElementById('loy-tray'), body:document.getElementById('loy-body'),
-        stats:document.getElementById('loy-stats'), status:document.getElementById('loy-status'), dp:document.getElementById('dpStatus'),
-        exportBtn:document.getElementById('loy-export'), importBtn:document.getElementById('loy-import'),
-        visitInfo:document.getElementById('visitInfo'), newVisitBtn:document.getElementById('newVisitBtn'),
-      },
-      players: JSON.parse(localStorage.getItem('bm_loyalty_v1')||'{}'),
-      currentId:null,
-      visitId: Number(localStorage.getItem('bm_visit_id')||'1'),
-      visitPunched: JSON.parse(localStorage.getItem('bm_visit_punched')||'[]'),
-    };
-    function savePlayers(){ localStorage.setItem('bm_loyalty_v1', JSON.stringify(loy.players)); }
-    function saveVisit(){ localStorage.setItem('bm_visit_id', String(loy.visitId)); localStorage.setItem('bm_visit_punched', JSON.stringify(loy.visitPunched)); loy.els.visitInfo.textContent=`#${loy.visitId} • ${loy.visitPunched.length} punched`; }
-    function newVisit(auto=false){ if(!auto && !confirm('Start a new visit?')) return; loy.visitId+=1; loy.visitPunched=[]; saveVisit(); loySetStatus(`Visit #${loy.visitId} started.`, true); }
-    loy.els.newVisitBtn.addEventListener('click',()=>newVisit(false));
-    function isDoubleTuesday(){ return new Date().getDay()===2; }
-    function loySetStatus(msg, ok=true){ loy.els.status.innerHTML=`<span style="font-weight:700;${ok?'color:#1a7f37':'color:#b71c1c'}">${ok?'✓':'✗'}</span> ${msg}`; }
-    function loyUpdateDPLabel(){ const a=isDoubleTuesday(); loy.els.dp.textContent=`Double Punch Tuesday: ${a?'ACTIVE all day':'auto all day on Tuesdays'}`; loy.els.dp.style.fontWeight=a?'700':'400'; }
-    setInterval(loyUpdateDPLabel,30000); loyUpdateDPLabel(); saveVisit();
-
-    function loyRenderTray(player){
-      loy.els.tray.innerHTML=''; const punches=player?(player.punches||0):0;
-      for(let i=0;i<REQUIRED_PUNCHES;i++){
-        const div=document.createElement('div');
-        div.className='chipbox'+(i<punches?' filled':'')+(i===REQUIRED_PUNCHES-1?' free':'');
-        div.textContent = i<punches?'☕':(i===REQUIRED_PUNCHES-1?'FREE':'☕');
-        loy.els.tray.appendChild(div);
-      }
-    }
-    function loyRenderTable(){
-      const entries=Object.entries(loy.players);
-      loy.els.body.innerHTML = entries.map(([id,p])=>`
-        <tr>
-          <td style="padding:8px;border-bottom:1px solid var(--border)">${id}</td>
-          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.punches||0}/${REQUIRED_PUNCHES}</td>
-          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.rewards||0}</td>
-          <td style="padding:8px;border-bottom:1px solid var(--border)">${p.last? new Date(p.last).toLocaleString() : '—'}</td>
-          <td style="padding:8px;border-bottom:1px solid var(--border)"><button class="btn" data-loyload="${id}">Load</button></td>
-        </tr>`).join('');
-      const totalRewards=entries.reduce((a,[,p])=>a+(p.rewards||0),0);
-      loy.els.stats.textContent=`Players: ${entries.length} • Rewards banked: ${totalRewards}`;
-      loy.els.body.querySelectorAll('[data-loyload]').forEach(b=>b.addEventListener('click',()=>{
-        loy.currentId=b.getAttribute('data-loyload'); loy.els.id.value=loy.currentId; loyRenderTray(loy.players[loy.currentId]||null);
-      }));
-    }
-    function loyaltyRenderAll(){ loyRenderTable(); loyRenderTray(loy.currentId?loy.players[loy.currentId]:null); }
-
-    loy.els.add.addEventListener('click',()=>{
-      const id=(loy.els.id.value||'').trim(); if(!id) return loySetStatus('Enter a customer name.',false);
-      if(loy.visitPunched.includes(id)) return loySetStatus('Already punched this visit. Start a New Visit to punch again.', false);
-      const inc=isDoubleTuesday()?2:1;
-      const p=loy.players[id]||{punches:0,rewards:0,last:null};
-      p.punches += inc;
-      if(p.punches>=REQUIRED_PUNCHES){ p.punches -= REQUIRED_PUNCHES; p.rewards = (p.rewards||0)+1; }
-      p.last = Date.now();
-      loy.players[id]=p; savePlayers();
-      loy.currentId=id; loy.visitPunched.push(id); saveVisit();
-      loySetStatus(`Punch added (${p.punches}/${REQUIRED_PUNCHES})${inc===2?' (Double Tuesday!)':''}`, true);
-      loyaltyRenderAll();
-    });
-
-    loy.els.undo.addEventListener('click',()=>{
-      const id=(loy.els.id.value||'').trim(); if(!id) return loySetStatus('Enter a customer name.',false);
-      const p=loy.players[id]; if(!p) return loySetStatus('Customer not found.',false);
-      if(p.punches>0) p.punches--; else if(p.rewards>0){ p.rewards--; p.punches=REQUIRED_PUNCHES-1; }
-      p.last=Date.now(); loy.players[id]=p; savePlayers();
-      loy.visitPunched = loy.visitPunched.filter(x=>x!==id); saveVisit();
-      loySetStatus('Removed one punch.', true); loyaltyRenderAll();
-    });
-
-    function openRewardWizardBM(){
-      const item={ id:'loy-reward-bm', name:'🎁 Loyalty Reward: Large Meal + 2 Cheesecakes', price:0, type:'bundle', drinksIncluded:10 };
-      openComboWizard(item,1);
-    }
-    loy.els.redeem.addEventListener('click',()=>{
-      const id=(loy.els.id.value||'').trim(); if(!id) return loySetStatus('Enter a customer name.',false);
-      const p=loy.players[id]; if(!p || (p.rewards||0)<=0) return loySetStatus('No rewards banked for this customer.',false);
-      p.rewards--; p.last=Date.now(); loy.players[id]=p; savePlayers();
-      loy.currentId=id; loySetStatus('Reward redeemed! Pick your 10 drinks.', true);
-      openRewardWizardBM();
-    });
-
-    const _oldAddToCart = addToCart;
-    addToCart = function(line){
-      _oldAddToCart(line);
-      if(line && line.id==='loy-reward-bm'){
-        _oldAddToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Loyalty Reward)', unitPrice:0, qty:10*(line.qty||1), type:'extra', meta:'Loyalty Reward' });
-        _oldAddToCart({ id:'ex-cheese', name:'🍰 Cheesecake (Loyalty Reward)', unitPrice:0, qty:2*(line.qty||1), type:'extra', meta:'Loyalty Reward' });
-      }
-    };
-
-    loy.els.exportBtn.addEventListener('click',()=>{
-      const blob=new Blob([JSON.stringify({players:loy.players,visitId:loy.visitId},null,2)],{type:'application/json'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='beanmachine_loyalty_backup.json'; a.click();
-    });
-    loy.els.importBtn.addEventListener('click',()=>{
-      const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json';
-      inp.onchange=e=>{
-        const file=e.target.files[0]; if(!file) return;
-        const fr=new FileReader(); fr.onload=()=>{ try{
-          const data=JSON.parse(fr.result); if(data.players) loy.players=data.players;
-          if(typeof data.visitId==='number') loy.visitId=data.visitId;
-          localStorage.setItem('bm_loyalty_v1', JSON.stringify(loy.players)); saveVisit(); loyaltyRenderAll(); loySetStatus('Import complete.', true);
-        }catch{ loySetStatus('Import failed (bad JSON).', false);} };
-        fr.readAsText(file);
-      };
-      inp.click();
-    });
-
     // ---------- Init ----------
-    renderAll(); loyaltyRenderAll();
+    renderAll();
   </script>
 </body>
 </html>
