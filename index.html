@@ -124,7 +124,7 @@
           </div>
 
           <div class="section">
-            <h3 style="margin:0 0 8px 0">Bakes & Drinks</h3>
+            <h3 style="margin:0 0 8px 0">Bakes, Ice Cream & Drinks</h3>
             <div class="cards" id="extras"></div>
           </div>
         </div>
@@ -331,6 +331,17 @@
       extras: [
         { id:'ex-lemon',  name:'🥤 Pink Lemonade', price:50,  type:'extra', isDrink:true },
 
+        /* ---------- NEW: Ice Creams ---------- */
+        { id:'ex-ice-van',  name:'🍦 Vanilla Ice Cream',       price:20, type:'extra' },
+        { id:'ex-ice-choc', name:'🍦 Chocolate Ice Cream',     price:20, type:'extra' },
+        { id:'ex-ice-apple',name:'🍦 Apple Ice Cream',         price:20, type:'extra' },
+        { id:'ex-ice-banana',name:'🍦 Banana Ice Cream',       price:20, type:'extra' },
+        { id:'ex-ice-mango', name:'🍦 Mango Ice Cream',        price:20, type:'extra' },
+        { id:'ex-ice-pom',   name:'🍦 Pomegranate Ice Cream',  price:20, type:'extra' },
+        { id:'ex-ice-water', name:'🍦 Watermelon Ice Cream',   price:20, type:'extra' },
+        { id:'ex-ice-lemon', name:'🍦 Lemon Ice Cream',        price:20, type:'extra' },
+        /* ------------------------------------ */
+
         { id:'ex-cup',    name:'🧁 Cupcake',        price:30,  type:'extra' },
         { id:'ex-cookie', name:'🍪 Cream Cookie',   price:40,  type:'extra' },
         { id:'ex-donut',  name:'🍩 Donut',          price:25,  type:'extra' },
@@ -353,6 +364,22 @@
       'bev-iced': {'Coffee bag':1,'Sugar':1,'Milk':1,'Water':1},
       'bev-esp' : {'Coffee bag':2,'Water':2},
       'bev-choc': {'Milk':2,'Sugar':2,'Cocoa Powder':4},
+
+      /* ---------- NEW: Ice Cream recipes ----------
+         Base: Ice Cream Cone + Milk
+         Chocolate: + Cocoa Powder
+         Fruit flavors: + the fruit
+      ------------------------------------------------ */
+      'ex-ice-van'  : {'Ice Cream Cone':1,'Milk':1},
+      'ex-ice-choc' : {'Ice Cream Cone':1,'Milk':1,'Cocoa Powder':1},
+      'ex-ice-apple': {'Ice Cream Cone':1,'Milk':1,'Apple':1},
+      'ex-ice-banana':{'Ice Cream Cone':1,'Milk':1,'Banana':1},
+      'ex-ice-mango': {'Ice Cream Cone':1,'Milk':1,'Mango':1},
+      'ex-ice-pom'  : {'Ice Cream Cone':1,'Milk':1,'Pomegranate':1},
+      'ex-ice-water': {'Ice Cream Cone':1,'Milk':1,'Watermelon':1},
+      'ex-ice-lemon': {'Ice Cream Cone':1,'Milk':1,'Lemon':1},
+      /* ------------------------------------------- */
+
       'ex-cake-berry': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cherry':1,'Strawberry':1},
       'ex-cake-lemon': {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Lemon':2},
       'ex-cake-choc' : {'Flour':1,'Sugar':1,'Milk':1,'Egg':1,'Cocoa Powder':2},
@@ -990,9 +1017,11 @@ function openComboWizard(item, qty){
           <td style="padding:8px;border-bottom:1px solid var(--border)">${p.last? new Date(p.last).toLocaleString() : '—'}</td>
           <td style="padding:8px;border-bottom:1px solid var(--border)"><button class="btn" data-loyload="${id}">Load</button></td>
         </tr>`).join('');
-      loy.els.body.querySelectorAll('[data-loyload]').forEach(b=>b.addEventListener('click',()=>{ loy.currentId=b.getAttribute('data-loyload'); loy.els.id.value=loy.currentId; loyRenderTray(loy.players[loy.currentId]||null); }));
       const totalRewards=entries.reduce((a,[,p])=>a+(p.rewards||0),0);
       loy.els.stats.textContent=`Players: ${entries.length} • Rewards banked: ${totalRewards}`;
+      loy.els.body.querySelectorAll('[data-loyload]').forEach(b=>b.addEventListener('click',()=>{
+        loy.currentId=b.getAttribute('data-loyload'); loy.els.id.value=loy.currentId; loyRenderTray(loy.players[loy.currentId]||null);
+      }));
     }
     function loyaltyRenderAll(){ loyRenderTable(); loyRenderTray(loy.currentId?loy.players[loy.currentId]:null); }
 
