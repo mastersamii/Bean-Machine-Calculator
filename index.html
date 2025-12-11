@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bean Machine Order Calculator</title>
   <!-- Favicon -->
-<link rel="icon" type="image/png" href="https://i.ibb.co/vxBK9r5R/BM.png">
-<link rel="apple-touch-icon" href="https://i.ibb.co/vxBK9r5R/BM.png">
-<meta name="theme-color" content="#1f2937">
+  <link rel="icon" type="image/png" href="https://i.ibb.co/vxBK9r5R/BM.png">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/vxBK9r5R/BM.png">
+  <meta name="theme-color" content="#1f2937">
   <style>
     :root {
       --brown:#6b4f3b; --tan:#d7c3a3; --cream:#f7f3ec; --ink:#1f1a17; --muted:#6a6a6a;
@@ -243,39 +243,60 @@
         { id:'bev-esp',  name:'⚡ Espresso',      price:60,  type:'drink' },
         { id:'bev-iced', name:'🧊 Iced Latte',    price:30,  type:'drink' },
         { id:'bev-choc', name:'🍫 Hot Chocolate', price:85,  type:'drink' },
+        { id:'bev-matcha',  name:'🍵 Matcha Latte',  price:55,  type:'drink' },
       ],
       bundles: [
-        { id:'bd-med',   name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',  price:375, type:'bundle', drinksIncluded:5,
-          description:'Pick any 5 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 5 Wonder Waffles.' },
-        { id:'bd-large', name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles', price:750, type:'bundle', drinksIncluded:10,
-          description:'Pick any 10 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 10 Wonder Waffles.' },
+        {
+          id:'bd-med',
+          name:'🥐 Medium Café Meal: 5 Drinks + 5 Waffles',
+          price:375,
+          type:'bundle',
+          drinksIncluded:5,
+          description:'Pick any 5 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte, Matcha Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 5 Wonder Waffles.'
+        },
+        {
+          id:'bd-large',
+          name:'🥐 Large Café Meal: 10 Drinks + 10 Waffles',
+          price:750,
+          type:'bundle',
+          drinksIncluded:10,
+          description:'Pick any 10 drinks (🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte, Matcha Latte). Espresso +$20 each · Hot Chocolate +$24 each. Includes 10 Wonder Waffles.'
+        },
 
-        { id:'pk-beanbox',
+        {
+          id:'pk-beanbox',
           name:'🍱 Bean Box: Large Meal + Lunch Box',
-          price:980, type:'bundle', drinksIncluded:10,
-          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte. Espresso +$20 each · Hot Chocolate +$24 each.' },
-        { id:'rf-beanbox',
+          price:980,
+          type:'bundle',
+          drinksIncluded:10,
+          description:'Includes 1 Lunch Box + 10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte, Matcha Latte. Espresso +$20 each · Hot Chocolate +$24 each.'
+        },
+        {
+          id:'rf-beanbox',
           name:'🍱 Bean Box Refill: 10 Drinks + 10 Waffles',
-          price:540, type:'bundle', drinksIncluded:10,
-          description:'10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte. Espresso +$20 each · Hot Chocolate +$24 each.' },
+          price:540,
+          type:'bundle',
+          drinksIncluded:10,
+          description:'10 drinks + 10 waffles. Pick from 🥤 Pink Lemonade, Bean Coffee, Espresso, Hot Chocolate, Iced Latte, Matcha Latte. Espresso +$20 each · Hot Chocolate +$24 each.'
+        },
 
-        { id:'sp-hay',   name:'Hayward Special', price:1250, type:'bundle',
-          description:'10 Wonder Waffles + 10 Iced Lattes + 2 Cakes of your choice.' },
+        { id:'sp-hay',   name:'Hayward Special', price:1600, type:'bundle',
+          description:'20 Wonder Waffles + 20 Iced Lattes + 4 Cakes of your choice + 4 Ice Creams.' },
         { id:'sp-kids',  name:'Kids Meal', price:2200, type:'bundle',
           description:'5 Wonder Waffles + 5 Hot Chocolates + 1 Kinder Egg.' },
       ],
 
       // ---------- Ice Cream  ----------
       iceCream: [
-        { id:'ex-ice-van',   name:'🍦 Vanilla Ice Cream',      price:70, type:'extra' },  // 6 + 10 = 16 -> 40
-        { id:'ex-ice-choc',  name:'🍦 Chocolate Ice Cream',    price:70, type:'extra' },  // + Cocoa 8 -> 24 -> 60
-        { id:'ex-ice-apple', name:'🍦 Apple Ice Cream',        price:70, type:'extra' },  // + Apple 8 -> 24 -> 60
-        { id:'ex-ice-banana',name:'🍦 Banana Ice Cream',       price:70, type:'extra' },  // + Banana 8 -> 24 -> 60
-        { id:'ex-ice-mango', name:'🍦 Mango Ice Cream',        price:70, type:'extra' },  // + Mango 12 -> 28 -> 70
-        { id:'ex-ice-pom',   name:'🍦 Pomegranate Ice Cream',  price:70, type:'extra' },  // + Pomegranate 14 -> 30 -> 75
-        { id:'ex-ice-water', name:'🍦 Watermelon Ice Cream',   price:70, type:'extra' },  // + Watermelon 20 -> 36 -> 90
-        { id:'ex-ice-lemon', name:'🍦 Lemon Ice Cream',        price:70, type:'extra' },  // + Lemon 6 -> 22 -> 55
-        { id:'ex-ice-straw', name:'🍦 Strawberry Ice Cream',    price:70, type:'extra' }, // 2× strawberry fruit
+        { id:'ex-ice-van',   name:'🍦 Vanilla Ice Cream',      price:70, type:'extra' },
+        { id:'ex-ice-choc',  name:'🍦 Chocolate Ice Cream',    price:70, type:'extra' },
+        { id:'ex-ice-apple', name:'🍦 Apple Ice Cream',        price:70, type:'extra' },
+        { id:'ex-ice-banana',name:'🍦 Banana Ice Cream',       price:70, type:'extra' },
+        { id:'ex-ice-mango', name:'🍦 Mango Ice Cream',        price:70, type:'extra' },
+        { id:'ex-ice-pom',   name:'🍦 Pomegranate Ice Cream',  price:70, type:'extra' },
+        { id:'ex-ice-water', name:'🍦 Watermelon Ice Cream',   price:70, type:'extra' },
+        { id:'ex-ice-lemon', name:'🍦 Lemon Ice Cream',        price:70, type:'extra' },
+        { id:'ex-ice-straw', name:'🍦 Strawberry Ice Cream',   price:70, type:'extra' },
       ],
 
       extras: [
@@ -303,6 +324,7 @@
       'bev-iced': {'Coffee bag':1,'Sugar':1,'Milk':1,'Water':1},
       'bev-esp' : {'Coffee bag':2,'Water':2},
       'bev-choc': {'Milk':2,'Sugar':2,'Cocoa Powder':4},
+      'bev-matcha': {'Macha Powder':2,'Water':2},
 
       // Ice Cream bases: Cone + Milk; add flavor ingredient
       'ex-ice-van'  : {'Ice Cream Cone':1,'Milk':1},
@@ -349,12 +371,14 @@
       for(const pool of pools){ const f = pool.find(x=>x.id===id); if(f) return f; }
       return null;
     }
+
     function getMealDrinkPool(){
       return [
-        ...MENU.classic.filter(x=>['bev-bean','bev-esp','bev-iced','bev-choc'].includes(x.id)),
+        ...MENU.classic.filter(x=>['bev-bean','bev-esp','bev-iced','bev-choc','bev-matcha'].includes(x.id)),
         ...MENU.extras.filter(x=>x.id==='ex-lemon')
       ];
     }
+
     function getCakePool(){ return MENU.extras.filter(x=>x.id.startsWith('ex-cake-')); }
 
     // ---------- Cards ----------
@@ -592,236 +616,293 @@
     const comboNext=document.getElementById('comboNext');
     document.getElementById('closeCombo').addEventListener('click',()=>comboModal.close());
 
-function openComboWizard(item, qty){
-  const usedTotal = (counts) => Object.values(counts).reduce((a,b)=>a+b,0);
+    function openComboWizard(item, qty){
+      const usedTotal = (counts) => Object.values(counts).reduce((a,b)=>a+b,0);
 
-  // ---------- HAYWARD SPECIAL: choose 2 cakes ----------
-  if(item.id==='sp-hay'){
-    const cakesNeeded = 2*(qty||1);
-    const cakePool = getCakePool();
-    const cakeCounts = {};
-    let confirmMode=false;
+      // ---------- HAYWARD SPECIAL: choose cakes ----------
+      if(item.id==='sp-hay'){
+        const cakesNeeded = 4*(qty||1);
+        const cakePool = getCakePool();
+        const cakeCounts = {};
+        let confirmMode=false;
 
-    const renderCakeGrid=()=>{
-      const used = usedTotal(cakeCounts);
-      const remaining = cakesNeeded - used;
-      comboTitle.textContent = `Cakes: pick ${cakesNeeded} (remaining ${Math.max(0,remaining)})`;
-      comboSteps.innerHTML = confirmMode ? '1. Cakes · <strong>2. Confirm</strong>' : '<strong>1. Cakes</strong> · 2. Confirm';
-      comboContent.innerHTML = `
-        <div class="selector-grid">
-          ${cakePool.map(p=>`
-            <div class="select-card" data-id="${p.id}">
-              <div class="select-title">${p.name}</div>
-              <div class="select-qty">
-                <button data-minus="${p.id}">−</button>
-                <output data-out="${p.id}">${cakeCounts[p.id]||0}</output>
-                <button data-plus="${p.id}">+</button>
+        const renderCakeGrid=()=>{
+          const used = usedTotal(cakeCounts);
+          const remaining = cakesNeeded - used;
+          comboTitle.textContent = `Cakes: pick ${cakesNeeded} (remaining ${Math.max(0,remaining)})`;
+          comboSteps.innerHTML = confirmMode ? '1. Cakes · <strong>2. Confirm</strong>' : '<strong>1. Cakes</strong> · 2. Confirm';
+          comboContent.innerHTML = `
+            <div class="selector-grid">
+              ${cakePool.map(p=>`
+                <div class="select-card" data-id="${p.id}">
+                  <div class="select-title">${p.name}</div>
+                  <div class="select-qty">
+                    <button data-minus="${p.id}">−</button>
+                    <output data-out="${p.id}">${cakeCounts[p.id]||0}</output>
+                    <button data-plus="${p.id}">+</button>
+                  </div>
+                  <div class="toolrow" style="gap:6px; margin-top:6px;">
+                    <button class="btn" data-half="${p.id}">Half</button>
+                    <button class="btn" data-max="${p.id}">Max</button>
+                  </div>
+                </div>`).join('')}
+            </div>`;
+
+          comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              const id = btn.getAttribute('data-plus');
+              if (usedTotal(cakeCounts) < cakesNeeded){
+                cakeCounts[id] = (cakeCounts[id]||0) + 1;
+                renderCakeGrid();
+              }
+            });
+          });
+          comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              const id = btn.getAttribute('data-minus');
+              cakeCounts[id] = Math.max(0, (cakeCounts[id]||0) - 1);
+              renderCakeGrid();
+            });
+          });
+
+          comboContent.querySelectorAll('[data-half]').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              const id = btn.getAttribute('data-half');
+              const current = cakeCounts[id]||0;
+              const usedWithout = usedTotal(cakeCounts) - current;
+              const remainingForThis = Math.max(0, cakesNeeded - usedWithout);
+              const target = Math.min(Math.ceil(cakesNeeded/2), remainingForThis);
+              cakeCounts[id] = target;
+              renderCakeGrid();
+            });
+          });
+          comboContent.querySelectorAll('[data-max]').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+              const id = btn.getAttribute('data-max');
+              const current = cakeCounts[id]||0;
+              const usedWithout = usedTotal(cakeCounts) - current;
+              const remainingForThis = Math.max(0, cakesNeeded - usedWithout);
+              cakeCounts[id] = remainingForThis;
+              renderCakeGrid();
+            });
+          });
+
+          comboPrev.style.display='none';
+          comboNext.textContent = confirmMode ? 'Add to Cart' : 'Next';
+          comboNext.disabled = remaining>0;
+        };
+
+        const renderConfirm=()=>{
+          comboTitle.textContent = item.name;
+          const fmt = id => (findMenuItem(id)||{}).name||id;
+          const list = Object.entries(cakeCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
+          comboSteps.innerHTML = '1. Cakes · <strong>2. Confirm</strong>';
+          comboContent.innerHTML = `
+            <div class="summary" style="gap:10px;">
+              ${list.length?`<div><strong>Cakes:</strong> ${list.join(', ')}</div>`:''}
+              <div class="small muted">
+                Includes 20 Iced Lattes, 20 Wonder Waffles, and 4 Ice Creams automatically.
               </div>
-              <div class="toolrow" style="gap:6px; margin-top:6px;">
-                <button class="btn" data-half="${p.id}">Half</button>
-                <button class="btn" data-max="${p.id}">Max</button>
-              </div>
-            </div>`).join('')}
-        </div>`;
+            </div>`;
+          comboPrev.style.display='none';
+          comboNext.textContent='Add to Cart';
+          comboNext.disabled=false;
+        };
 
-      comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const id = btn.getAttribute('data-plus');
-          if (usedTotal(cakeCounts) < cakesNeeded){
-            cakeCounts[id] = (cakeCounts[id]||0) + 1;
-            renderCakeGrid();
+        comboNext.onclick=()=>{
+          if(!confirmMode){
+            confirmMode=true;
+            renderConfirm();
+            return;
           }
+
+          const q = qty || 1;
+
+          // Main Hayward line (20/20 + 4 cakes + 4 ice creams)
+          addToCart({
+            id:item.id,
+            name:item.name,
+            unitPrice:item.price,
+            qty:q,
+            type:item.type,
+            cakes:cakeCounts,
+            meta:'Includes 20 Iced Lattes, 20 Wonder Waffles, and 4 Ice Creams'
+          });
+
+          // Included waffles
+          addToCart({
+            id:'ex-waffle',
+            name:'🧇 Wonder Waffle (Hayward)',
+            unitPrice:0,
+            qty:20*q,
+            type:'extra',
+            meta:'Hayward Special'
+          });
+
+          // Included iced lattes
+          addToCart({
+            id:'bev-iced',
+            name:'🧊 Iced Latte (Hayward)',
+            unitPrice:0,
+            qty:20*q,
+            type:'drink',
+            meta:'Hayward Special'
+          });
+
+          // Included ice creams (using Vanilla for ingredient tracking)
+          addToCart({
+            id:'ex-ice-van',
+            name:'🍦 Vanilla Ice Cream (Hayward)',
+            unitPrice:0,
+            qty:4*q,
+            type:'extra',
+            meta:'Hayward Special'
+          });
+
+          // Included cakes from selection
+          Object.entries(cakeCounts).forEach(([id,c])=>{
+            if(c>0){
+              const nm=(getCakePool().find(x=>x.id===id)||{}).name||'Cake';
+              addToCart({
+                id,
+                name:`${nm} (Hayward)`,
+                unitPrice:0,
+                qty:c*q,
+                type:'extra',
+                meta:'Hayward Special'
+              });
+            }
+          });
+
+          comboModal.close();
+        };
+
+        renderCakeGrid();
+        comboModal.showModal();
+        return;
+      }
+
+      // ---------- MEALS & BEAN BOX: choose drinks ----------
+      const drinksNeeded = item.drinksIncluded || 0;
+      const pool = getMealDrinkPool();
+      const counts = {};
+      let confirmMode=false;
+
+      const renderGrid=()=>{
+        const used = usedTotal(counts);
+        const remaining = drinksNeeded - used;
+        comboTitle.textContent = `Drinks: pick ${drinksNeeded} (remaining ${Math.max(0,remaining)})`;
+        comboSteps.innerHTML = confirmMode ? '1. Drinks · <strong>2. Confirm</strong>' : '<strong>1. Drinks</strong> · 2. Confirm';
+        comboContent.innerHTML = `
+          <div class="selector-grid">
+            ${pool.map(p=>`
+              <div class="select-card" data-id="${p.id}">
+                <div class="select-title">${p.name}</div>
+                <div class="select-qty">
+                  <button data-minus="${p.id}">−</button>
+                  <output data-out="${p.id}">${counts[p.id]||0}</output>
+                  <button data-plus="${p.id}">+</button>
+                </div>
+                <div class="toolrow" style="gap:6px; margin-top:6px;">
+                  <button class="btn" data-half="${p.id}">Half</button>
+                  <button class="btn" data-max="${p.id}">Max</button>
+                </div>
+              </div>`).join('')}
+          </div>`;
+
+        comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-plus');
+            if (usedTotal(counts) < drinksNeeded){
+              counts[id] = (counts[id]||0) + 1;
+              renderGrid();
+            }
+          });
         });
-      });
-      comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const id = btn.getAttribute('data-minus');
-          cakeCounts[id] = Math.max(0, (cakeCounts[id]||0) - 1);
-          renderCakeGrid();
+        comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-minus');
+            counts[id] = Math.max(0, (counts[id]||0) - 1);
+            renderGrid();
+          });
         });
-      });
 
-      comboContent.querySelectorAll('[data-half]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const id = btn.getAttribute('data-half');
-          const current = cakeCounts[id]||0;
-          const usedWithout = usedTotal(cakeCounts) - current;
-          const remainingForThis = Math.max(0, cakesNeeded - usedWithout);
-          const target = Math.min(Math.ceil(cakesNeeded/2), remainingForThis);
-          cakeCounts[id] = target;
-          renderCakeGrid();
+        comboContent.querySelectorAll('[data-half]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-half');
+            const current = counts[id]||0;
+            const usedWithout = usedTotal(counts) - current;
+            const remainingForThis = Math.max(0, drinksNeeded - usedWithout);
+            const target = Math.min(Math.ceil(drinksNeeded/2), remainingForThis);
+            counts[id] = target;
+            renderGrid();
+          });
         });
-      });
-      comboContent.querySelectorAll('[data-max]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const id = btn.getAttribute('data-max');
-          const current = cakeCounts[id]||0;
-          const usedWithout = usedTotal(cakeCounts) - current;
-          const remainingForThis = Math.max(0, cakesNeeded - usedWithout);
-          cakeCounts[id] = remainingForThis;
-          renderCakeGrid();
+        comboContent.querySelectorAll('[data-max]').forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const id = btn.getAttribute('data-max');
+            const current = counts[id]||0;
+            const usedWithout = usedTotal(counts) - current;
+            const remainingForThis = Math.max(0, drinksNeeded - usedWithout);
+            counts[id] = remainingForThis;
+            renderGrid();
+          });
         });
-      });
 
-      comboPrev.style.display='none';
-      comboNext.textContent = confirmMode ? 'Add to Cart' : 'Next';
-      comboNext.disabled = remaining>0;
-    };
+        comboPrev.style.display='none';
+        comboNext.textContent = confirmMode ? 'Add to Cart' : 'Next';
+        comboNext.disabled = remaining>0;
+      };
 
-    const renderConfirm=()=>{
-      comboTitle.textContent = item.name;
-      const fmt = id => (findMenuItem(id)||{}).name||id;
-      const list = Object.entries(cakeCounts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
-      comboSteps.innerHTML = '1. Cakes · <strong>2. Confirm</strong>';
-      comboContent.innerHTML = `
-        <div class="summary" style="gap:10px;">
-          ${list.length?`<div><strong>Cakes:</strong> ${list.join(', ')}</div>`:''}
-          <div class="small muted">Includes 10 Iced Lattes & 10 Waffles automatically.</div>
-        </div>`;
-      comboPrev.style.display='none';
-      comboNext.textContent='Add to Cart';
-      comboNext.disabled=false;
-    };
+      const renderConfirm=()=>{
+        comboTitle.textContent=item.name||'Confirm Selection';
+        const fmt=id=>(findMenuItem(id)||{}).name||id;
+        const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
+        const info=(findMenuItem(item.id)?.description)||'';
+        comboSteps.innerHTML='1. Drinks · <strong>2. Confirm</strong>';
+        comboContent.innerHTML = `
+          <div class="summary" style="gap:10px;">
+            ${drinkParts.length?`<div><strong>Drinks:</strong> ${drinkParts.join(', ')}</div>`:''}
+            ${info?`<div class="small muted">${info}</div>`:''}
+          </div>`;
+        comboPrev.style.display='none';
+        comboNext.textContent='Add to Cart';
+        comboNext.disabled=false;
+      };
 
-    comboPrev.onclick=()=>{};
-    comboNext.onclick=()=>{
-      if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
-      addToCart({ id:item.id, name:item.name, unitPrice:item.price, qty:qty||1, type:item.type, cakes:cakeCounts, meta:'Includes 10 Iced Lattes + 10 Waffles' });
-      addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Hayward)', unitPrice:0, qty:10*(qty||1), type:'extra', meta:'Hayward Special' });
-      addToCart({ id:'bev-iced', name:'🧊 Iced Latte (Hayward)', unitPrice:0, qty:10*(qty||1), type:'drink', meta:'Hayward Special' });
-      Object.entries(cakeCounts).forEach(([id,c])=>{ if(c>0){
-        const nm=(getCakePool().find(x=>x.id===id)||{}).name||'Cake';
-        addToCart({ id, name:`${nm} (Hayward)`, unitPrice:0, qty:c, type:'extra', meta:'Hayward Special' });
-      }});
-      comboModal.close();
-    };
+      comboPrev.onclick=()=>{};
+      comboNext.onclick=()=>{
+        if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
+        const espCount  = (counts['bev-esp']  || 0);
+        const chocCount = (counts['bev-choc'] || 0);
+        const upcharge = (20 * espCount) + (24 * chocCount);
+        const fmt=id=>(findMenuItem(id)||{}).name||id;
+        const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
+        const meta=drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
+        addToCart({
+          id:item.id,
+          name:item.name + (upcharge>0?` (+$${upcharge} premium drinks)`:'' ),
+          unitPrice:(item.price + upcharge),
+          qty:qty||1,
+          type:item.type,
+          drinks:counts,
+          meta
+        });
 
-    renderCakeGrid();
-    comboModal.showModal();
-    return;
-  }
-
-  // ---------- MEALS & BEAN BOX: choose drinks ----------
-  const drinksNeeded = item.drinksIncluded || 0;
-  const pool = getMealDrinkPool();
-  const counts = {};
-  let confirmMode=false;
-
-  const renderGrid=()=>{
-    const used = usedTotal(counts);
-    const remaining = drinksNeeded - used;
-    comboTitle.textContent = `Drinks: pick ${drinksNeeded} (remaining ${Math.max(0,remaining)})`;
-    comboSteps.innerHTML = confirmMode ? '1. Drinks · <strong>2. Confirm</strong>' : '<strong>1. Drinks</strong> · 2. Confirm';
-    comboContent.innerHTML = `
-      <div class="selector-grid">
-        ${pool.map(p=>`
-          <div class="select-card" data-id="${p.id}">
-            <div class="select-title">${p.name}</div>
-            <div class="select-qty">
-              <button data-minus="${p.id}">−</button>
-              <output data-out="${p.id}">${counts[p.id]||0}</output>
-              <button data-plus="${p.id}">+</button>
-            </div>
-            <div class="toolrow" style="gap:6px; margin-top:6px;">
-              <button class="btn" data-half="${p.id}">Half</button>
-              <button class="btn" data-max="${p.id}">Max</button>
-            </div>
-          </div>`).join('')}
-      </div>`;
-
-    comboContent.querySelectorAll('[data-plus]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const id = btn.getAttribute('data-plus');
-        if (usedTotal(counts) < drinksNeeded){
-          counts[id] = (counts[id]||0) + 1;
-          renderGrid();
+        const waffles =
+          item.id==='bd-med' ? 5 :
+          (['bd-large','pk-beanbox','rf-beanbox'].includes(item.id) ? 10 : 0);
+        if(waffles>0) addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:waffles*(qty||1), type:'extra', meta:'Meal' });
+        if(item.id==='pk-beanbox'){
+          addToCart({ id:'ex-lunch', name:'🍱 Lunch Box (Included)', unitPrice:0, qty:1*(qty||1), type:'extra', meta:'Bean Box' });
         }
-      });
-    });
-    comboContent.querySelectorAll('[data-minus]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const id = btn.getAttribute('data-minus');
-        counts[id] = Math.max(0, (counts[id]||0) - 1);
-        renderGrid();
-      });
-    });
 
-    comboContent.querySelectorAll('[data-half]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const id = btn.getAttribute('data-half');
-        const current = counts[id]||0;
-        const usedWithout = usedTotal(counts) - current;
-        const remainingForThis = Math.max(0, drinksNeeded - usedWithout);
-        const target = Math.min(Math.ceil(drinksNeeded/2), remainingForThis);
-        counts[id] = target;
-        renderGrid();
-      });
-    });
-    comboContent.querySelectorAll('[data-max]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const id = btn.getAttribute('data-max');
-        const current = counts[id]||0;
-        const usedWithout = usedTotal(counts) - current;
-        const remainingForThis = Math.max(0, drinksNeeded - usedWithout);
-        counts[id] = remainingForThis;
-        renderGrid();
-      });
-    });
+        comboModal.close();
+      };
 
-    comboPrev.style.display='none';
-    comboNext.textContent = confirmMode ? 'Add to Cart' : 'Next';
-    comboNext.disabled = remaining>0;
-  };
-
-  const renderConfirm=()=>{
-    comboTitle.textContent=item.name||'Confirm Selection';
-    const fmt=id=>(findMenuItem(id)||{}).name||id;
-    const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
-    const info=(findMenuItem(item.id)?.description)||'';
-    comboSteps.innerHTML='1. Drinks · <strong>2. Confirm</strong>';
-    comboContent.innerHTML = `
-      <div class="summary" style="gap:10px;">
-        ${drinkParts.length?`<div><strong>Drinks:</strong> ${drinkParts.join(', ')}</div>`:''}
-        ${info?`<div class="small muted">${info}</div>`:''}
-      </div>`;
-    comboPrev.style.display='none';
-    comboNext.textContent='Add to Cart';
-    comboNext.disabled=false;
-  };
-
-  comboPrev.onclick=()=>{};
-  comboNext.onclick=()=>{
-    if(!confirmMode){ confirmMode=true; renderConfirm(); return; }
-    const espCount  = (counts['bev-esp']  || 0);
-    const chocCount = (counts['bev-choc'] || 0);
-    const upcharge = (20 * espCount) + (24 * chocCount);
-    const fmt=id=>(findMenuItem(id)||{}).name||id;
-    const drinkParts=Object.entries(counts).filter(([,c])=>c>0).map(([id,c])=>`${fmt(id)} x${c}`);
-    const meta=drinkParts.length?`Drinks: ${drinkParts.join(', ')}`:'';
-    addToCart({
-      id:item.id,
-      name:item.name + (upcharge>0?` (+$${upcharge} premium drinks)`:'' ),
-      unitPrice:(item.price + upcharge),
-      qty:qty||1,
-      type:item.type,
-      drinks:counts,
-      meta
-    });
-
-    const waffles =
-      item.id==='bd-med' ? 5 :
-      (['bd-large','pk-beanbox','rf-beanbox'].includes(item.id) ? 10 : 0);
-    if(waffles>0) addToCart({ id:'ex-waffle', name:'🧇 Wonder Waffle (Included)', unitPrice:0, qty:waffles*(qty||1), type:'extra', meta:'Meal' });
-    if(item.id==='pk-beanbox'){
-      addToCart({ id:'ex-lunch', name:'🍱 Lunch Box (Included)', unitPrice:0, qty:1*(qty||1), type:'extra', meta:'Bean Box' });
+      renderGrid();
+      comboModal.showModal();
     }
-
-    comboModal.close();
-  };
-
-  renderGrid();
-  comboModal.showModal();
-}
 
     // ---------- Ingredients (tab only) ----------
     function aggregateIngredients(){
@@ -847,12 +928,14 @@ function openComboWizard(item, qty){
       });
       return tally;
     }
+
     function renderIngredients(){
       const wrap=document.getElementById('ingredientList');
       const entries=Object.entries(aggregateIngredients()).sort((a,b)=>a[0].localeCompare(b[0]));
       if(!entries.length){ wrap.innerHTML='<div class="muted">No ingredients yet. Add items to the cart.</div>'; return; }
       wrap.innerHTML = entries.map(([n,c])=>`<div class="ing-list"><div>${n}</div><div><strong>x${c}</strong></div></div>`).join('');
     }
+
     document.getElementById('copyIngBtn')?.addEventListener('click',()=>{
       const txt=Object.entries(aggregateIngredients()).sort((a,b)=>a[0].localeCompare(b[0])).map(([n,c])=>`- ${n} x${c}`).join('\n');
       navigator.clipboard.writeText(txt).then(()=>alert('Ingredients copied to clipboard!'));
@@ -882,6 +965,7 @@ function openComboWizard(item, qty){
       state.history.unshift(entry); persistHistory();
       state.cart=[]; state.discountPct=0; persist(); renderAll(); selectTab('summary');
     }
+
     function resetAll(){ state.cart=[]; state.discountPct=0; persist(); renderAll(); renderIngredients(); }
 
     document.getElementById('checkoutBtn').addEventListener('click',checkout);
@@ -891,9 +975,17 @@ function openComboWizard(item, qty){
 
     // ---------- Theme ----------
     const themeBtn=document.getElementById('themeBtn');
-    function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); localStorage.setItem('beanmachine_theme',t); themeBtn.textContent=t==='dark'?'☀️ Light':'🌙 Dark'; themeBtn.setAttribute('aria-pressed',t==='dark'); }
+    function applyTheme(t){
+      document.documentElement.setAttribute('data-theme',t);
+      localStorage.setItem('beanmachine_theme',t);
+      themeBtn.textContent=t==='dark'?'☀️ Light':'🌙 Dark';
+      themeBtn.setAttribute('aria-pressed',t==='dark');
+    }
     applyTheme(localStorage.getItem('beanmachine_theme')||'light');
-    themeBtn.addEventListener('click',()=>{ const next=(localStorage.getItem('beanmachine_theme')||'light')==='light'?'dark':'light'; applyTheme(next); });
+    themeBtn.addEventListener('click',()=>{
+      const next=(localStorage.getItem('beanmachine_theme')||'light')==='light'?'dark':'light';
+      applyTheme(next);
+    });
 
     // ---------- Init ----------
     renderAll();
